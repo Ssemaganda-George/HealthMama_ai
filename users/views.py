@@ -1,6 +1,7 @@
+# users/views.py
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -38,6 +39,7 @@ def home(request):
                 messages.success(request, 'Account created successfully. You can now log in.')
 
     return render(request, 'users/home.html')
+
 
 # Data input view
 @login_required
