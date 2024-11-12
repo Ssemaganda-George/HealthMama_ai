@@ -1,42 +1,63 @@
-<!-- ai/templates/ai/chatbot.html -->
 {% load static %}
 {% extends "mama_ai/base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'ai/css/styles.css' %}">
-    <title>AI Chatbot</title>
-</head>
-<body>
+{% block content %}
+<div class="chatbot-container">
     <h1>Welcome to MaMa AI</h1>
+    
+    <!-- Chat display area -->
+    <div class="chat-display" id="chat-display">
+        <!-- Messages will be appended here dynamically -->
+    </div>
+
+    <!-- Chat input area -->
     <form id="chat-form" method="POST" action="{% url 'chat' %}">
-        <label for="message">Your Message:</label>
-        <input type="text" id="message" name="message" required>
+        {% csrf_token %}
+        <input type="text" id="message" name="message" placeholder="Type your message here..." required>
         <button type="submit">Send</button>
     </form>
+</div>
 
-    <div id="chat-response"></div>
+<script>
+    const chatForm = document.getElementById('chat-form');
+    const chatDisplay = document.getElementById('chat-display');
 
-    <script>
-        const chatForm = document.getElementById('chat-form');
-        chatForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const messageInput = document.getElementById('message');
-            const userMessage = messageInput.value;
-            
-            const response = await fetch("{% url 'chat' %}", {
-                method: 'POST',
-                body: new URLSearchParams({
-                    'message': userMessage,
-                }),
-            });
+    chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const messageInput = document.getElementById('message');
+        const userMessage = messageInput.value;
 
-            const data = await response.json();
-            document.getElementById('chat-response').innerText = "AI: " + data.message;
+        if (userMessage.trim() === '') return;
+
+        // Display user message
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.classList.add('user-message');
+        userMessageDiv.innerText = "You: " + userMessage;
+        chatDisplay.appendChild(userMessageDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;  // Auto-scroll to bottom
+
+        messageInput.value = '';  // Clear input field
+
+        // Fetch AI response
+        const response = await fetch("{% url 'chat' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'message': userMessage,
+            }),
         });
-    </script>
-</body>
-</html>
+
+        const data = await response.json();
+
+        // Display AI response
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.classList.add('bot-message');
+        botMessageDiv.innerText = "AI: " + data.message;
+        chatDisplay.appendChild(botMessageDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;  // Auto-scroll to bottom
+    });
+</script>
+{% endblock %}
