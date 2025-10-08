@@ -129,11 +129,14 @@ def health_check():
 @app.route('/test', methods=['GET', 'POST'])
 def test_endpoint():
     """Test endpoint to debug issues"""
+    api_key = os.getenv('OPENAI_API_KEY')
     return jsonify({
         'method': request.method,
         'endpoint': 'test',
         'status': 'working',
-        'openai_key_configured': bool(os.getenv('OPENAI_API_KEY')),
+        'openai_key_configured': bool(api_key),
+        'api_key_length': len(api_key) if api_key else 0,
+        'api_key_starts_with': api_key[:20] + '...' if api_key else 'None',
         'data_status': {
             'diabetes_loaded': len(diabetes_data) > 0,
             'preeclampsia_loaded': len(preeclampsia_data) > 0
