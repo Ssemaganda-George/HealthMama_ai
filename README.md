@@ -270,3 +270,7 @@ For support and questions:
 ---
 
 **HealthMama AI** - Empowering health decisions with AI 🏥✨
+
+
+Project hosted here as a railway app:
+https://railway.com/project/f15ffa48-defe-4766-a5be-9b538d248fce/service/d6a2ec4b-3ec1-4171-aa5c-80ea3ce17168/variables?environmentId=9abeadc0-ef3c-4dbf-812a-63b83ff6dcff

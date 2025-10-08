@@ -344,6 +344,69 @@
             box-shadow: var(--shadow);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+            position: relative;
+            max-height: 300px; /* Set a max height for smooth animation */
+        }
+
+        .welcome-section.collapsed {
+            margin-bottom: 0;
+            padding: 0;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            border: none;
+            box-shadow: none;
+        }
+
+        .welcome-section.collapsed * {
+            visibility: hidden;
+        }
+
+        /* Toggle button for welcome section - Always visible */
+        .welcome-toggle {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            transition: all 0.3s ease-in-out;
+            z-index: 10000;
+            font-weight: bold;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-toggle:hover {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Welcome panel collapsed state - button appearance changes */
+        .welcome-toggle.show-panel {
+            background: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+        }
+
+        .welcome-toggle.show-panel:hover {
+            background: #c0392b !important;
+            border-color: #c0392b !important;
+        }
+
+        /* Chat container adjustments for collapsed state */
+        .chat-container.expanded {
+            height: calc(100vh - 140px);
         }
 
         .welcome-section h2 {
@@ -1234,7 +1297,10 @@
         </header>
 
         <main class="main-container">
-            <section class="welcome-section">
+            <!-- Welcome Panel Toggle Button - Always Visible -->
+            <button class="welcome-toggle" id="welcomeToggle" onclick="toggleWelcomeSection()" title="Hide panel">−</button>
+            
+            <section class="welcome-section" id="welcomeSection">
                 <h2>Welcome to HealthMama AI</h2>
                 <p>Your personal health companion for pregnancy, diabetes management, and maternal wellness. Choose your specialized model below to get started:</p>
                 <div class="model-selector">
@@ -1255,7 +1321,7 @@
                 <strong>Security Notice:</strong> Please avoid sharing sensitive personal information like full names, addresses, or medical record numbers.
             </div>
 
-            <div class="chat-container">
+            <div class="chat-container" id="chatContainer">
                 <div class="chat-messages" id="chatMessages">
                     <div class="message assistant">
                         <i class="fas fa-robot"></i> Hello! I'm HealthMama AI, your trusted health companion. I'm here to help with questions about pregnancy, diabetes management, and maternal health. How can I assist you today?
@@ -1283,7 +1349,7 @@
                         <textarea 
                             id="userInput" 
                             class="chat-input" 
-                            placeholder="Ask me about your health, pregnancy, or diabetes management..."
+                            placeholder="Ask me about your health, pregnancy, or related risks management..."
                             maxlength="2000"
                             onkeypress="handleKeyPress(event)"
                         ></textarea>
@@ -2160,6 +2226,31 @@
             // Show success notification
             const modelName = modelId === 'preeclampsia' ? 'Pre-eclampsia' : 'Gestational Diabetes';
             showNotification(`Switched to ${modelName} Model! 🎯`, 'success');
+        }
+
+        // Toggle welcome section visibility
+        function toggleWelcomeSection() {
+            const welcomeSection = document.getElementById('welcomeSection');
+            const chatContainer = document.getElementById('chatContainer');
+            const toggleButton = document.getElementById('welcomeToggle');
+            
+            const isCollapsed = welcomeSection.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // Show welcome section
+                welcomeSection.classList.remove('collapsed');
+                chatContainer.classList.remove('expanded');
+                toggleButton.textContent = '−';
+                toggleButton.classList.remove('show-panel');
+                toggleButton.title = 'Hide panel';
+            } else {
+                // Hide welcome section
+                welcomeSection.classList.add('collapsed');
+                chatContainer.classList.add('expanded');
+                toggleButton.textContent = '+';
+                toggleButton.classList.add('show-panel');
+                toggleButton.title = 'Show panel';
+            }
         }
     </script>
 </body>
