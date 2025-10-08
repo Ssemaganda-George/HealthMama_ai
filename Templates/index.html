@@ -1811,6 +1811,61 @@
             });
         }
 
+        // Language detection function
+        function detectLanguage(text) {
+            if (!text) return 'en';
+            
+            // Simple language detection based on common words and patterns
+            const lugandaWords = ['nze', 'gwe', 'ye', 'oli', 'buli', 'bw\'oli', 'nga', 'ku', 'wa', 'ba', 'mu', 'omuntu', 'abantu', 'omukazi', 'omusajja', 'omwana', 'omubiri', 'obulwadde', 'amazzi', 'emmere', 'ddagala', 'amaanyi', 'obuyinza', 'okugenda', 'okuva', 'okujja', 'okukola', 'okutegeera', 'okusoma', 'okuwandika', 'webale', 'weebale', 'mzungu', 'munnamwandu', 'ssebo', 'nyabo', 'ki', 'anti', 'nti', 'sirina', 'nina', 'tukooye', 'simanyi', 'ndi', 'nga bw\'oli', 'kino', 'kiti', 'bulabe', 'obuwuka', 'amazzi g\'omubiri', 'bulunji', 'bulungi', 'gyendi', 'wano', 'eyo', 'eri', 'ssukali', 'omusujja'];
+            const swahiliWords = ['mimi', 'wewe', 'yeye', 'una', 'nina', 'hana', 'kwa', 'wa', 'za', 'ya', 'mtu', 'watu', 'mwanamke', 'mwanaume', 'mtoto', 'mwili', 'ugonjwa', 'maji', 'chakula', 'dawa', 'nguvu', 'uwezo', 'kwenda', 'kutoka', 'kuja', 'kufanya', 'kuelewa', 'kusoma', 'kuandika', 'asante', 'mzungu', 'bwana', 'mama', 'nini', 'kwa sababu', 'sina', 'kila', 'hii', 'hiki', 'hatari', 'habari', 'nzuri', 'vizuri'];
+            const frenchWords = ['je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'suis', 'es', 'est', 'sommes', 'êtes', 'sont', 'de', 'du', 'des', 'le', 'la', 'les', 'un', 'une', 'homme', 'femme', 'enfant', 'corps', 'maladie', 'eau', 'nourriture', 'médicament', 'force', 'pouvoir', 'aller', 'venir', 'faire', 'comprendre', 'lire', 'écrire', 'merci', 'bonjour', 'bonsoir', 'oui', 'non', 'pourquoi', 'parce que', 'avec', 'sans', 'pour', 'dans', 'sur', 'sous', 'danger', 'comment', 'allez'];
+            
+            const textLower = text.toLowerCase();
+            
+            // Check for exact Luganda phrases first
+            const lugandaPhrases = ['oli bulunji', 'oli bulungi', 'oli otya', 'webale nyo', 'weebale nyo', 'nga bw\'oli', 'ssukali gwange'];
+            if (lugandaPhrases.some(phrase => textLower.includes(phrase))) {
+                return 'lg';
+            }
+            
+            // Check for exact Swahili phrases
+            const swahiliPhrases = ['habari yako', 'hujambo', 'sijambo', 'asante sana', 'karibu sana'];
+            if (swahiliPhrases.some(phrase => textLower.includes(phrase))) {
+                return 'sw';
+            }
+            
+            // Check for exact French phrases
+            const frenchPhrases = ['comment allez', 'ça va', 'je suis', 'merci beaucoup', 'bonjour', 'bonsoir'];
+            if (frenchPhrases.some(phrase => textLower.includes(phrase))) {
+                return 'fr';
+            }
+            
+            // Count matches for each language
+            let lugandaCount = 0;
+            let swahiliCount = 0;
+            let frenchCount = 0;
+            
+            // Split text into words for better matching
+            const words = textLower.split(/\s+/);
+            
+            words.forEach(word => {
+                if (lugandaWords.includes(word)) lugandaCount++;
+                if (swahiliWords.includes(word)) swahiliCount++;
+                if (frenchWords.includes(word)) frenchCount++;
+            });
+            
+            // Require at least 1 match and prefer the language with highest count
+            if (lugandaCount > 0 && lugandaCount >= swahiliCount && lugandaCount >= frenchCount) {
+                return 'lg'; // Luganda
+            } else if (swahiliCount > 0 && swahiliCount > frenchCount) {
+                return 'sw'; // Swahili
+            } else if (frenchCount > 0) {
+                return 'fr'; // French
+            } else {
+                return 'en'; // Default to English
+            }
+        }
+
         function sendMessage() {
             const userInput = document.getElementById('userInput');
             const message = validateInput(userInput.value);
@@ -1840,6 +1895,9 @@
             showTypingIndicator();
             document.getElementById('sendButton').disabled = true;
             
+            // Detect the language of the user's message
+            const detectedLanguage = detectLanguage(message);
+            
             // Prepare data for sending
             let requestData;
             let requestOptions;
@@ -1849,6 +1907,7 @@
                 requestData = new FormData();
                 requestData.append('query', message || 'Please analyze this image');
                 requestData.append('model', selectedModel);
+                requestData.append('language', detectedLanguage);
                 requestData.append('image', selectedImage);
                 
                 requestOptions = {
@@ -1859,7 +1918,8 @@
                 // Use JSON for text-only messages
                 requestData = JSON.stringify({ 
                     message: message,
-                    model: selectedModel 
+                    model: selectedModel,
+                    language: detectedLanguage
                 });
                 
                 requestOptions = {

@@ -34,6 +34,7 @@ def chat():
         
         user_message = data.get('message', '').strip()
         model = data.get('model', 'diabetes')
+        language = data.get('language', 'en')  # Get user's language
         
         if not user_message:
             return jsonify({
@@ -45,8 +46,8 @@ def chat():
         # Get relevant context from data service
         context = current_app.data_service.search_data(user_message, model, limit=5)
         
-        # Generate response
-        response = openai_service.generate_response(user_message, model, context)
+        # Generate response with language preference
+        response = openai_service.generate_response(user_message, model, context, language)
         
         response_time = time.time() - start_time
         current_app.logger.info(f"Chat response generated in {response_time:.2f} seconds")
@@ -77,10 +78,12 @@ def ask():
         if request.form:
             user_message = request.form.get('query', '').strip()
             model = request.form.get('model', 'diabetes')
+            language = request.form.get('language', 'en')
         elif request.is_json:
             data = request.get_json()
             user_message = data.get('message', '').strip()
             model = data.get('model', 'diabetes')
+            language = data.get('language', 'en')
         else:
             return jsonify({
                 'error': 'No data received',
@@ -97,8 +100,8 @@ def ask():
         # Get relevant context from data service
         context = current_app.data_service.search_data(user_message, model, limit=5)
         
-        # Generate response
-        response = openai_service.generate_response(user_message, model, context)
+        # Generate response with language preference
+        response = openai_service.generate_response(user_message, model, context, language)
         
         return jsonify({
             'response': response,

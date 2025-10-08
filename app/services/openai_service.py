@@ -58,11 +58,11 @@ class OpenAIService:
         # Set OpenAI API key
         openai.api_key = Config.OPENAI_API_KEY
     
-    def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None) -> str:
-        """Generate response using OpenAI API"""
+    def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None, language: str = 'en') -> str:
+        """Generate response using OpenAI API with language preference"""
         try:
             # Check for cross-model queries first
-            cross_model_response = self._check_cross_model_query(user_message, model)
+            cross_model_response = self._check_cross_model_query(user_message, model, language)
             if cross_model_response:
                 # Add both user message and assistant response to conversation
                 self.conversation_manager.add_message(model, "user", user_message)
@@ -80,10 +80,8 @@ class OpenAIService:
             # Get conversation history
             conversation_history = self.conversation_manager.get_conversation(model)
             
-            # Detect language and add appropriate instructions
-            conversation_history = self._detect_luganda_and_add_instruction(
-                user_message, conversation_history, model
-            )
+            # Add language-specific instructions
+            conversation_history = self._add_language_instruction(language, conversation_history, model)
             
             # Prepare messages for OpenAI
             messages = [{"role": "system", "content": self._get_system_prompt(model)}] + conversation_history
@@ -113,7 +111,7 @@ class OpenAIService:
             self.logger.error(f"OpenAI error: {str(e)}")
             return f"Sorry, I encountered an error: {str(e)}"
     
-    def _check_cross_model_query(self, user_message: str, current_model: str) -> Optional[str]:
+    def _check_cross_model_query(self, user_message: str, current_model: str, language: str = 'en') -> Optional[str]:
         """Check if user is asking about the wrong topic for current model"""
         message_lower = user_message.lower()
         
@@ -135,44 +133,24 @@ class OpenAIService:
         if current_model == 'diabetes':
             if any(keyword in message_lower for keyword in preeclampsia_keywords):
                 return self._generate_cross_model_response(
-                    'diabetes', 'preeclampsia', user_message, message_lower
+                    'diabetes', 'preeclampsia', user_message, message_lower, language
                 )
         
         # Check if preeclampsia model is being asked about diabetes
         elif current_model == 'preeclampsia':
             if any(keyword in message_lower for keyword in diabetes_keywords):
                 return self._generate_cross_model_response(
-                    'preeclampsia', 'diabetes', user_message, message_lower
+                    'preeclampsia', 'diabetes', user_message, message_lower, language
                 )
         
         return None
     
     def _generate_cross_model_response(self, current_model: str, suggested_model: str, 
-                                     user_message: str, message_lower: str) -> str:
+                                     user_message: str, message_lower: str, language: str = 'en') -> str:
         """Generate response when user asks about wrong topic"""
         
-        # More specific Luganda detection for cross-model responses
-        strong_luganda_indicators = [
-            'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi', 'omukazi', 'omuntu',
-            'nkutegeera', 'nkwagala', 'weebale', 'nkusaba', 'njagala', 'nkwegayirira'
-        ]
-        
-        weak_luganda_indicators = [
-            'nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy'
-        ]
-        
-        # Check for strong Luganda indicators
-        has_strong_luganda = any(indicator in message_lower for indicator in strong_luganda_indicators)
-        
-        # Check for multiple weak indicators (at least 2)
-        weak_count = sum(1 for indicator in weak_luganda_indicators if indicator in message_lower)
-        has_multiple_weak = weak_count >= 2
-        
-        # Only use Luganda if we have strong evidence
-        is_luganda = has_strong_luganda or has_multiple_weak
-        
         if current_model == 'diabetes' and suggested_model == 'preeclampsia':
-            if is_luganda:
+            if language == 'lg':  # Luganda
                 return (
                     "Nkutegeera nti obuuza ku preeclampsia. Kino kiragiro kya maanyi nnyo ku bakazi abali mu lubuto. "
                     "Preeclampsia kitegeeza omusujja gw'omusaayi ogweyongera n'amafuta mu nsigo.\n\n"
@@ -186,7 +164,35 @@ class OpenAIService:
                     "Okufuna obuyambi obujjuvu ku preeclampsia, <strong>kyuusakyuuse ku Pre-eclampsia Model</strong> "
                     "mu menu waggulu. Eyo gye munaafunira obuyambi obwetongole ku preeclampsia n'obulamu bw'omukazi ali mu lubuto."
                 )
-            else:
+            elif language == 'sw':  # Swahili
+                return (
+                    "Naelewa kuwa unajibu kuhusu preeclampsia. Hii ni hali ya hatari kwa wanawake wajawazito. "
+                    "Preeclampsia inamaanisha shinikizo la damu la juu na protini katika mkojo.\n\n"
+                    "<strong>Dalili za Preeclampsia:</strong>\n"
+                    "• Shinikizo la damu la juu (zaidi ya 140/90)\n"
+                    "• Protini katika mkojo\n"
+                    "• Uvimbe wa mikono, miguu, na uso\n"
+                    "• Maumivu makali ya kichwa\n"
+                    "• Mabadiliko ya macho\n\n"
+                    "<strong>Hata hivyo,</strong> mimi ni mtaalamu wa kisukari (diabetes). "
+                    "Kwa msaada kamili kuhusu preeclampsia, tafadhali <strong>badilisha kwa Pre-eclampsia Model</strong> "
+                    "katika menyu hapo juu. Hiyo ni iliyoundwa maalum kutoa ushauri wa kina kuhusu preeclampsia."
+                )
+            elif language == 'fr':  # French
+                return (
+                    "Je comprends que vous posez des questions sur la prééclampsie. C'est une condition grave chez les femmes enceintes. "
+                    "La prééclampsie signifie une tension artérielle élevée et des protéines dans l'urine.\n\n"
+                    "<strong>Signes de Prééclampsie:</strong>\n"
+                    "• Tension artérielle élevée (au-dessus de 140/90)\n"
+                    "• Protéines dans l'urine\n"
+                    "• Gonflement des mains, pieds et visage\n"
+                    "• Maux de tête sévères\n"
+                    "• Changements de vision\n\n"
+                    "<strong>Cependant,</strong> je suis spécialisé dans le diabète. "
+                    "Pour une aide complète sur la prééclampsie, veuillez <strong>passer au Modèle Prééclampsie</strong> "
+                    "en utilisant le menu déroulant ci-dessus. Ce modèle est spécialement conçu pour fournir des conseils détaillés sur la prééclampsie."
+                )
+            else:  # English default
                 return (
                     "I understand you're asking about preeclampsia. This is a serious pregnancy condition "
                     "characterized by high blood pressure and protein in the urine.\n\n"
@@ -203,7 +209,7 @@ class OpenAIService:
                 )
         
         elif current_model == 'preeclampsia' and suggested_model == 'diabetes':
-            if is_luganda:
+            if language == 'lg':  # Luganda
                 return (
                     "Nkutegeera nti obuuza ku diabetes/ssukali. Kino kiragiro kya ssukali mu musaayi "
                     "okweyongera ennyo, era kyandibadde kya maanyi nnyo mu bakazi abali mu lubuto.\n\n"
@@ -217,7 +223,36 @@ class OpenAIService:
                     "Okufuna obuyambi obujjuvu ku diabetes, <strong>kyuusakyuuse ku Gestational Diabetes Model</strong> "
                     "mu menu waggulu. Eyo gye munaafunira obuyambi obwetongole ku ssukali n'emmere gy'olya."
                 )
-            else:
+            elif language == 'sw':  # Swahili
+                return (
+                    "Naelewa kuwa unajibu kuhusu kisukari. Hii ni hali ambapo kiwango cha sukari damu "
+                    "kinakuwa juu sana, na inaweza kuwa hatari wakati wa uja uzito.\n\n"
+                    "<strong>Dalili za Kisukari wakati wa Uja uzito:</strong>\n"
+                    "• Kiwango cha sukari damu cha juu\n"
+                    "• Kunywa maji mengi\n"
+                    "• Kukojoa mara nyingi\n"
+                    "• Kupoteza uzito bila sababu\n"
+                    "• Uchovu mkubwa\n\n"
+                    "<strong>Hata hivyo,</strong> mimi ni mtaalamu wa preeclampsia na afya ya mama mjamzito. "
+                    "Kwa msaada kamili kuhusu kisukari, tafadhali <strong>badilisha kwa Gestational Diabetes Model</strong> "
+                    "katika menyu hapo juu. Hiyo ni iliyoundwa maalum kutoa ushauri wa kina kuhusu kisukari na chakula."
+                )
+            elif language == 'fr':  # French
+                return (
+                    "Je comprends que vous posez des questions sur le diabète. C'est une condition où le taux de sucre dans le sang "
+                    "devient trop élevé, et cela peut être particulièrement important pendant la grossesse.\n\n"
+                    "<strong>Signes clés du Diabète:</strong>\n"
+                    "• Taux de sucre dans le sang élevé\n"
+                    "• Soif accrue\n"
+                    "• Mictions fréquentes\n"
+                    "• Perte de poids inexpliquée\n"
+                    "• Fatigue accrue\n\n"
+                    "<strong>Cependant,</strong> je suis spécialisé dans la prééclampsie et les complications de santé maternelle. "
+                    "Pour une aide complète avec le diabète, veuillez <strong>passer au Modèle Diabète Gestationnel</strong> "
+                    "en utilisant le menu déroulant ci-dessus. Ce modèle est spécialement conçu pour fournir "
+                    "des conseils détaillés sur la gestion du sucre dans le sang, l'alimentation et les soins du diabète."
+                )
+            else:  # English default
                 return (
                     "I understand you're asking about diabetes. This is a condition where blood sugar levels "
                     "become too high, and it can be particularly important during pregnancy.\n\n"
@@ -271,47 +306,40 @@ class OpenAIService:
                 "Provide accurate, concise, and informative responses based on your specialized knowledge of diabetes."
             )
     
-    def _detect_luganda_and_add_instruction(self, user_message: str, conversation_history: List[Dict], model: str) -> List[Dict]:
-        """Detect Luganda language and add specific instructions for better responses"""
-        # More specific Luganda detection - require multiple indicators or clear Luganda words
-        strong_luganda_indicators = [
-            'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi', 'omukazi', 'omuntu',
-            'nkutegeera', 'nkwagala', 'weebale', 'nkusaba', 'njagala', 'nkwegayirira'
-        ]
+    def _add_language_instruction(self, language: str, conversation_history: List[Dict], model: str) -> List[Dict]:
+        """Add language-specific instructions for better responses"""
         
-        weak_luganda_indicators = [
-            'nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy'
-        ]
+        language_instructions = {
+            'lg': (  # Luganda
+                "The user is asking in Luganda. Please respond in clear, detailed Luganda using simple terms. "
+                "Include practical advice relevant to Ugandan context. Use common Luganda health vocabulary "
+                "and explain medical terms clearly. Give specific examples with local foods like matooke, "
+                "posho, beans when discussing diet. Be culturally sensitive and use respectful Luganda language."
+            ),
+            'sw': (  # Swahili
+                "The user is asking in Swahili. Please respond in clear, detailed Swahili using simple terms. "
+                "Include practical advice relevant to East African context. Use common Swahili health vocabulary "
+                "and explain medical terms clearly. Give specific examples with local foods and cultural practices "
+                "when relevant. Be culturally sensitive and use respectful Swahili language."
+            ),
+            'fr': (  # French
+                "The user is asking in French. Please respond in clear, detailed French using simple terms. "
+                "Include practical advice and explain medical terms clearly. Use proper French medical vocabulary "
+                "while keeping the language accessible and easy to understand. Be professional and respectful."
+            ),
+            'en': (  # English (default)
+                "The user is asking in English. Please respond in clear, professional English. "
+                "Provide detailed, medically accurate information while keeping it accessible and easy to understand."
+            )
+        }
         
-        message_lower = user_message.lower()
+        # Use the appropriate instruction based on detected language
+        instruction = language_instructions.get(language, language_instructions['en'])
         
-        # Check for strong indicators (clear Luganda words)
-        has_strong_luganda = any(indicator in message_lower for indicator in strong_luganda_indicators)
-        
-        # Check for multiple weak indicators (at least 2)
-        weak_count = sum(1 for indicator in weak_luganda_indicators if indicator in message_lower)
-        has_multiple_weak = weak_count >= 2
-        
-        # Only add Luganda instructions if we have strong evidence
-        if has_strong_luganda or has_multiple_weak:
-            conversation_history.append({
-                "role": "system", 
-                "content": (
-                    "The user is clearly asking in Luganda. Please respond in clear, detailed Luganda using simple terms. "
-                    "Include practical advice relevant to Ugandan context. Use common Luganda health vocabulary "
-                    "and explain medical terms clearly. Give specific examples with local foods like matooke, "
-                    "posho, beans when discussing diet."
-                )
-            })
-        else:
-            # Default instruction to ensure English responses
-            conversation_history.append({
-                "role": "system", 
-                "content": (
-                    "The user is asking in English. Please respond in clear, professional English. "
-                    "Provide detailed, medically accurate information while keeping it accessible and easy to understand."
-                )
-            })
+        conversation_history.append({
+            "role": "system", 
+            "content": instruction
+        })
         
         return conversation_history
     
