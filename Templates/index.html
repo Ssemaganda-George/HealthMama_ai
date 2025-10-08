@@ -8,614 +8,1072 @@
     <link rel="icon" href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f468-200d-2695-fe0f.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        .edit-btn, .save-btn {
-            background: none;
-            border: none;
-            color: #888;
-            margin-left: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            vertical-align: middle;
-            transition: color 0.2s;
+        /* CSS Variables for Light/Dark Mode */
+        :root {
+            --bg-primary: linear-gradient(135deg, #e3f2fd 0%, #b2ebf2 100%);
+            --bg-secondary: rgba(255,255,255,0.99);
+            --bg-panel: #e3f2fd;
+            --bg-messages: #fff;
+            --bg-input: #e3f2fd;
+            --color-primary: #1976d2;
+            --color-secondary: #80deea;
+            --color-text: #333;
+            --color-text-light: #666;
+            --border-color: #b3e5fc;
+            --shadow-light: rgba(33,150,243,0.06);
+            --shadow-medium: rgba(33,150,243,0.13);
+            --button-bg: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
+            --button-hover: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
+            --danger-bg: linear-gradient(135deg, #e57373 60%, #f44336 100%);
+            --danger-hover: linear-gradient(135deg, #b71c1c 60%, #e57373 100%);
+            --voice-bg: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
+            --voice-hover: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
         }
-        .edit-btn:hover, .save-btn:hover {
-            color: #1976d2;
+
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --bg-secondary: rgba(30,30,30,0.95);
+            --bg-panel: #2d2d2d;
+            --bg-messages: #3a3a3a;
+            --bg-input: #2d2d2d;
+            --color-primary: #64b5f6;
+            --color-secondary: #4fc3f7;
+            --color-text: #e0e0e0;
+            --color-text-light: #b0b0b0;
+            --border-color: #555;
+            --shadow-light: rgba(0,0,0,0.3);
+            --shadow-medium: rgba(0,0,0,0.4);
+            --button-bg: linear-gradient(135deg, #1976d2 60%, #42a5f5 100%);
+            --button-hover: linear-gradient(135deg, #1565c0 60%, #1976d2 100%);
+            --danger-bg: linear-gradient(135deg, #f44336 60%, #d32f2f 100%);
+            --danger-hover: linear-gradient(135deg, #b71c1c 60%, #f44336 100%);
+            --voice-bg: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
+            --voice-hover: linear-gradient(135deg, #8e24aa 60%, #ab47bc 100%);
         }
-        .edit-input {
-            font-size: 1rem;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #b3e5fc;
-            width: 80%;
-            margin-left: 8px;
+
+        /* Preeclampsia Theme Variables */
+        .preeclampsia-theme {
+            --bg-primary: linear-gradient(135deg, #f3e5f5 0%, #ce93d8 100%);
+            --bg-panel: #f3e5f5;
+            --color-primary: #8e24aa;
+            --border-color: #ce93d8;
+            --button-bg: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
+            --button-hover: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
+            --danger-bg: linear-gradient(135deg, #f06292 60%, #bdbdbd 100%);
+            --danger-hover: linear-gradient(135deg, #bdbdbd 60%, #f06292 100%);
         }
-        body.diabetes-theme {
-            background: linear-gradient(135deg, #e3f2fd 0%, #b2ebf2 100%);
+
+        [data-theme="dark"].preeclampsia-theme {
+            --bg-primary: linear-gradient(135deg, #2d1b3d 0%, #4a2c6a 100%);
+            --bg-panel: #3d2c52;
+            --color-primary: #ce93d8;
+            --border-color: #6a4c80;
+            --button-bg: linear-gradient(135deg, #8e24aa 60%, #ab47bc 100%);
+            --button-hover: linear-gradient(135deg, #7b1fa2 60%, #8e24aa 100%);
         }
-        body.diabetes-theme .main-chat {
-            background: rgba(255,255,255,0.99);
-        }
-        body.diabetes-theme .chat-header h1 {
-            color: #1976d2;
-        }
-        body.diabetes-theme .history-panel {
-            background-color: #e3f2fd;
-            border-right: 1px solid #b3e5fc;
-        }
-        body.diabetes-theme .messages {
-            background: #fff;
-            border: 1px solid #b3e5fc;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.06);
-        }
-        body.diabetes-theme .input-container input {
-            background: #e3f2fd;
-            border: 1.5px solid #b3e5fc;
-        }
-        body.diabetes-theme .input-container input:focus {
-            border: 1.5px solid #1976d2;
-        }
-        body.diabetes-theme .input-container button {
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-        }
-        body.diabetes-theme .input-container button:hover, body.diabetes-theme .input-container button:focus {
-            background: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-        }
-        body.diabetes-theme .clear-button {
-            background: linear-gradient(135deg, #e57373 60%, #bdbdbd 100%);
-        }
-        body.diabetes-theme .clear-button:hover, body.diabetes-theme .clear-button:focus {
-            background: linear-gradient(135deg, #bdbdbd 60%, #e57373 100%);
-        }
-        
-        body.preeclampsia-theme {
-            background: linear-gradient(135deg, #f3e5f5 0%, #ce93d8 100%);
-        }
-        body.preeclampsia-theme .main-chat {
-            background: rgba(255,255,255,0.99);
-        }
-        body.preeclampsia-theme .chat-header h1 {
-            color: #8e24aa;
-        }
-        body.preeclampsia-theme .history-panel {
-            background-color: #f3e5f5;
-            border-right: 1px solid #ce93d8;
-        }
-        body.preeclampsia-theme .messages {
-            background: #fff;
-            border: 1px solid #ce93d8;
-            box-shadow: 0 2px 8px rgba(142,36,170,0.06);
-        }
-        body.preeclampsia-theme .input-container input {
-            background: #f3e5f5;
-            border: 1.5px solid #ce93d8;
-        }
-        body.preeclampsia-theme .input-container input:focus {
-            border: 1.5px solid #8e24aa;
-        }
-        body.preeclampsia-theme .input-container button {
-            background: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-        }
-        body.preeclampsia-theme .input-container button:hover, body.preeclampsia-theme .input-container button:focus {
-            background: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
-        }
-        body.preeclampsia-theme .clear-button {
-            background: linear-gradient(135deg, #f06292 60%, #bdbdbd 100%);
-        }
-        body.preeclampsia-theme .clear-button:hover, body.preeclampsia-theme .clear-button:focus {
-            background: linear-gradient(135deg, #bdbdbd 60%, #f06292 100%);
-        }
-        /* New Chat and Clear History Buttons */
-        .new-chat-button {
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 16px;
-            margin-bottom: 10px;
-            font-size: 0.97rem;
-            box-shadow: 0 1.5px 6px rgba(33,150,243,0.10);
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .new-chat-button:hover, .new-chat-button:focus {
-            background: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-            transform: translateY(-2px) scale(1.04);
-        }
-        body.preeclampsia-theme .new-chat-button {
-            background: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-        }
-        body.preeclampsia-theme .new-chat-button:hover, body.preeclampsia-theme .new-chat-button:focus {
-            background: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
-        }
-        .clear-history-button {
-            background: linear-gradient(135deg, #e57373 60%, #f44336 100%);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 16px;
-            margin-top: 10px;
-            font-size: 0.97rem;
-            box-shadow: 0 1.5px 6px rgba(244,67,54,0.10);
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .clear-history-button:hover, .clear-history-button:focus {
-            background: linear-gradient(135deg, #b71c1c 60%, #e57373 100%);
-            transform: translateY(-2px) scale(1.04);
-        }
+
+        /* Base Styles */
         html, body {
             height: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
         }
+
         body {
             font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
-            min-width: 100vw;
-            height: 100vh;
-            width: 100vw;
-            background: linear-gradient(135deg, #e3f2fd 0%, #b2ebf2 100%);
+            background: var(--bg-primary);
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            color: var(--color-text);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
+
+        /* Privacy Policy Modal */
+        .privacy-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .privacy-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: min(90vw, 600px);
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .privacy-content h2 {
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .privacy-content p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+            font-size: 0.95rem;
+        }
+
+        .privacy-content ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .privacy-content li {
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+
+        .privacy-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .privacy-accept, .privacy-decline {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            min-width: 120px;
+        }
+
+        .privacy-accept {
+            background: var(--button-bg);
+            color: white;
+        }
+
+        .privacy-accept:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .privacy-decline {
+            background: var(--danger-bg);
+            color: white;
+        }
+
+        .privacy-decline:hover {
+            background: var(--danger-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 8px var(--shadow-medium);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: scale(1.1);
+        }
+
+        /* Container and Layout */
         .container {
             display: flex;
             flex-direction: row;
             width: 100vw;
             height: 100vh;
-            max-width: 100vw;
-            max-height: 100vh;
-            background: rgba(255,255,255,0.99);
-            border-radius: 0;
-            box-shadow: 0 8px 32px rgba(33, 150, 243, 0.13);
+            background: var(--bg-secondary);
+            box-shadow: 0 8px 32px var(--shadow-medium);
             overflow: hidden;
-            margin: 0;
         }
+
         .history-panel {
-            width: 18%;
-            background-color: #e3f2fd; /* Light blue */
-            border-right: 1px solid #b3e5fc;
+            width: 300px;
+            min-width: 280px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            padding: 16px;
+            transition: all 0.3s ease;
         }
+
         .history-panel h2 {
             font-size: 1.2rem;
-            color: #1976d2; /* Hospital blue */
-            margin: 0 0 10px 0;
+            color: var(--color-primary);
+            margin: 0 0 16px 0;
+            font-weight: 600;
         }
+
         .history-list {
             flex: 1;
             overflow-y: auto;
-            border: 1px solid #b3e5fc;
-            border-radius: 8px;
-            background-color: #ffffff;
-        }
-        .history-item {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--bg-messages);
             padding: 8px;
-            border-bottom: 1px solid #ddd;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: relative;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            color: var(--color-text);
         }
+
         .history-item:hover {
-            background-color: #e1f5fe; /* Lighter blue */
+            background-color: var(--bg-panel);
+            transform: translateX(4px);
         }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
         .more-options {
             cursor: pointer;
             font-size: 1.2rem;
+            color: var(--color-text-light);
+            transition: color 0.2s ease;
         }
+
+        .more-options:hover {
+            color: var(--color-primary);
+        }
+
         .more-options-menu {
             display: none;
             position: absolute;
             right: 0;
-            top: 20px;
-            background-color: white;
-            border: 1px solid #ddd;
+            top: 40px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1;
+            box-shadow: 0 4px 12px var(--shadow-light);
+            z-index: 1000;
+            min-width: 120px;
         }
+
         .more-options-menu button {
             display: block;
             width: 100%;
-            padding: 8px;
+            padding: 10px 16px;
             border: none;
             background: none;
             cursor: pointer;
             text-align: left;
+            color: var(--color-text);
+            transition: background-color 0.2s ease;
         }
+
         .more-options-menu button:hover {
-            background-color: #c8e6c9; /* Light green */
+            background-color: var(--bg-panel);
         }
+
+        /* Action Buttons */
+        .new-chat-button, .clear-history-button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.97rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .new-chat-button {
+            background: var(--button-bg);
+            color: white;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .new-chat-button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .clear-history-button {
+            background: var(--danger-bg);
+            color: white;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .clear-history-button:hover {
+            background: var(--danger-hover);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Main Chat Area */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
-            width: 82%;
             padding: 32px 24px 20px 24px;
             background: transparent;
         }
+
         .chat-header {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        .chat-avatar {
+
+        .chat-logo {
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.1rem;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.13);
-            border: 2.5px solid #fff;
-            position: relative;
+            background: #fff;
+            box-shadow: 0 2px 8px var(--shadow-medium);
+            object-fit: cover;
         }
-        .chat-avatar .fa-user-doctor {
-            color: #fff;
-            text-shadow: 0 1px 4px #1976d2;
-        }
+
         h1 {
-            color: #1976d2;
+            color: var(--color-primary);
             font-size: 1.7rem;
             margin: 0;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
+
+        #modelSelect {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            font-size: 1rem;
+            background: var(--bg-input);
+            color: var(--color-primary);
+            font-weight: 600;
+            outline: none;
+            box-shadow: 0 1px 4px var(--shadow-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #modelSelect:focus {
+            border-color: var(--color-primary);
+        }
+
+        /* Messages Area */
         .messages {
             flex: 1;
             overflow-y: auto;
             padding: 18px 10px 10px 10px;
             margin-bottom: 10px;
-            background: #fff;
+            background: var(--bg-messages);
             border-radius: 12px;
-            border: none !important;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.06);
+            box-shadow: 0 2px 8px var(--shadow-light);
             position: relative;
         }
+
         .message {
             display: flex;
             align-items: flex-end;
             margin-bottom: 16px;
-            animation: fadeInUp 0.5s;
+            animation: fadeInUp 0.5s ease-out;
         }
+
         .message.user {
             flex-direction: row-reverse;
         }
+
         .message.bot {
             flex-direction: row;
         }
+
         .message .avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
+            background: var(--button-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            color: #fff;
+            font-size: 1.2rem;
+            color: white;
             margin: 0 8px;
-            box-shadow: 0 1px 4px rgba(33,150,243,0.10);
-            border: 2px solid #fff;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            border: 2px solid var(--bg-messages);
+            flex-shrink: 0;
         }
-        .message.user .avatar {
-            background: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-        }
-        .message.user .avatar.diabetes-user {
-            background: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-        }
-        .message.user .avatar.preeclampsia-user {
-            background: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-        }
-        .message.bot .avatar.diabetes-bot {
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-        }
-        .message.bot .avatar.preeclampsia-bot {
-            background: linear-gradient(135deg, #ab47bc 60%, #f3e5f5 100%);
-        }
-        .message.user .content.diabetes-user {
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-            color: white;
-        }
-        .message.user .content.preeclampsia-user {
-            background: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-            color: white;
-        }
-        .message.bot .content.diabetes-bot {
-            background: #fff;
-            color: #1976d2;
-        }
-        .message.bot .content.preeclampsia-bot {
-            background: #f3e5f5;
-            color: #8e24aa;
-        }
+
         .message .content {
-            max-width: 80%;
-            padding: 13px 16px;
+            max-width: 75%;
+            padding: 14px 18px;
             border-radius: 16px;
             font-size: 1rem;
             line-height: 1.5;
-            box-shadow: 0 1px 4px rgba(56,142,60,0.07);
+            box-shadow: 0 2px 8px var(--shadow-light);
             word-break: break-word;
-        }
-        .message.user .content {
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-            color: white;
-            text-align: right;
-        }
-        .message.bot .content {
-            background: #fff;
-            color: #1976d2;
-            text-align: left;
-        }
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .input-container {
-            display: flex;
-            align-items: center;
-            margin-top: 12px;
             position: relative;
         }
-        .input-container input {
-            flex: 1;
-            padding: 12px 16px 12px 40px;
-            border: 1.5px solid #b3e5fc;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: #e3f2fd url('https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f468-200d-2695-fe0f.png') 10px center no-repeat;
-            background-size: 22px 22px;
-            outline: none;
-            transition: border 0.2s;
-        }
-        .input-container input:focus {
-            border: 1.5px solid #1976d2;
-            background-color: #fff;
-        }
-        .input-container button {
-            margin-left: 8px;
-            padding: 8px 12px;
-            border: none;
-            background: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
+
+        .message.user .content {
+            background: var(--button-bg);
             color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.10);
-            transition: background 0.2s;
-            height: 36px;
-            width: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .input-container button:hover, .input-container button:focus {
-            background: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-        }
-        .voice-record-button {
-            margin-left: 8px;
-            background: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 8px rgba(142,36,170,0.10);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .voice-record-button:hover, .voice-record-button:focus {
-            background: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
-        }
-        .clear-button {
-            background: linear-gradient(135deg, #e57373 60%, #bdbdbd 100%);
-            margin-left: 10px;
-            color: #fff;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(244,67,54,0.10);
-        }
-        .clear-button:hover, .clear-button:focus {
-            background: linear-gradient(135deg, #bdbdbd 60%, #e57373 100%);
+            border-bottom-right-radius: 4px;
         }
 
-        .edit-btn, .save-btn {
-            background: none;
-            border: none;
-            color: #888;
-            margin-left: 8px;
+        .message.bot .content {
+            background: var(--bg-secondary);
+            color: var(--color-text);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Input Area */
+        .input-container {
+            display: flex;
+            align-items: stretch;
+            margin-top: 12px;
+            gap: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .image-upload-label {
+            position: absolute;
+            left: 12px;
+            z-index: 2;
             cursor: pointer;
-            font-size: 1.1rem;
-            vertical-align: middle;
-            transition: color 0.2s;
+            color: var(--color-text-light);
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
         }
-        .edit-btn:hover, .save-btn:hover {
-            color: #1976d2;
+
+        .image-upload-label:hover {
+            color: var(--color-primary);
         }
-        .edit-input {
+
+        #image-upload {
+            display: none;
+        }
+
+        #query {
+            width: 100%;
+            padding: 14px 16px 14px 40px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
             font-size: 1rem;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #b3e5fc;
-            width: 80%;
-            margin-left: 8px;
+            background: var(--bg-input);
+            color: var(--color-text);
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
         }
+
+        #query:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        #query::placeholder {
+            color: var(--color-text-light);
+        }
+
+        #image-preview {
+            max-width: 38px;
+            max-height: 38px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            vertical-align: middle;
+            display: none;
+        }
+
+        .action-button {
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .send-button {
+            background: var(--button-bg);
+        }
+
+        .send-button:hover {
+            background: var(--button-hover);
+            transform: scale(1.05);
+        }
+
+        .voice-record-button {
+            background: var(--voice-bg);
+        }
+
+        .voice-record-button:hover {
+            background: var(--voice-hover);
+            transform: scale(1.05);
+        }
+
+        .voice-record-button.recording {
+            background: #ff5722;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Scroll Button */
+        #scrollLatest {
+            position: absolute;
+            right: 24px;
+            bottom: 90px;
+            z-index: 100;
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        #scrollLatest:hover {
+            background: var(--button-hover);
+            transform: scale(1.1);
+        }
+
+        /* Typing Indicator */
         .typing-indicator {
             display: none;
             text-align: center;
-            margin-top: 10px;
+            margin: 10px 0;
         }
+
         .typing-indicator .dot {
-            width: 10px;
-            height: 10px;
-            background-color: #388e3c; /* Darker green */
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-primary);
             border-radius: 50%;
             display: inline-block;
-            animation: typing 1s infinite;
+            animation: typing 1.4s infinite ease-in-out;
+            margin: 0 2px;
         }
-        .typing-indicator .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-indicator .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+
+        .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+
         @keyframes typing {
-            0% {
-                transform: translateY(0);
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
             }
-            50% {
-                transform: translateY(-8px);
-            }
-            100% {
-                transform: translateY(0);
+            40% {
+                transform: scale(1);
+                opacity: 1;
             }
         }
-        @media (max-width: 900px) {
+
+        /* Caution Message */
+        .caution-message {
+            margin: 12px auto 0;
+            max-width: 480px;
+            color: #b26a00;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            text-align: center;
+            box-shadow: 0 1px 4px var(--shadow-light);
+        }
+
+        /* Edit Functionality */
+        .edit-btn, .save-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-light);
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+            padding: 4px;
+        }
+
+        .edit-btn:hover, .save-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .edit-input {
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--color-text);
+            width: 100%;
+            font-family: inherit;
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 12px;
+                right: 12px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+
             .container {
                 flex-direction: column;
-                min-height: 100vh;
-                width: 100vw;
                 height: 100vh;
-                margin: 0;
+                width: 100vw;
             }
+
             .history-panel {
-                width: 100vw;
+                width: 100%;
                 height: 180px;
+                min-width: unset;
+                padding: 12px;
                 border-right: none;
-                border-bottom: 1px solid #ddd;
-                overflow-y: auto;
+                border-bottom: 1px solid var(--border-color);
             }
+
+            .history-panel h2 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .new-chat-button, .clear-history-button {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
             .main-chat {
-                width: 100vw;
-                min-height: calc(100vh - 180px);
                 height: calc(100vh - 180px);
-                padding: 18px 6px 10px 6px;
+                padding: 16px 12px 12px 12px;
+            }
+
+            .chat-header {
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+
+            .chat-logo {
+                width: 36px;
+                height: 36px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            #modelSelect {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+
+            .message .content {
+                max-width: 85%;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .input-container {
+                gap: 6px;
+            }
+
+            #query {
+                padding: 12px 16px 12px 36px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .action-button {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+
+            .privacy-content {
+                padding: 1.5rem;
+                max-width: 95vw;
+            }
+
+            .privacy-content h2 {
+                font-size: 1.3rem;
+            }
+
+            .privacy-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .privacy-accept, .privacy-decline {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .caution-message {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                margin: 8px auto 0;
             }
         }
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 0;
-                box-shadow: none;
-                width: 100vw;
-                height: 100vh;
+
+        @media (max-width: 480px) {
+            .chat-header {
+                flex-direction: column;
+                gap: 12px;
             }
+
             .main-chat {
-                padding: 8px 2px 6px 2px;
-                width: 100vw;
-                height: calc(100vh - 180px);
+                padding: 12px 8px 8px 8px;
             }
+
+            .message .content {
+                max-width: 90%;
+                padding: 10px 14px;
+            }
+
+            .history-panel {
+                height: 160px;
+                padding: 8px;
+            }
+
+            .main-chat {
+                height: calc(100vh - 160px);
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: #000;
+                --shadow-light: rgba(0,0,0,0.5);
+                --shadow-medium: rgba(0,0,0,0.7);
+            }
+
+            [data-theme="dark"] {
+                --border-color: #fff;
+                --color-text: #fff;
+                --color-text-light: #ccc;
+            }
+        }
+
+        /* Focus indicators for keyboard navigation */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="history-panel" id="historyPanel">
-            <button class="new-chat-button" onclick="clearChat(true)"><i class="fa-solid fa-plus"></i> New Chat</button>
-            <div class="history-list" id="historyList"></div>
-            <button class="clear-history-button" onclick="confirmClearAllHistory()">Clear All History</button>
+    <!-- Privacy Policy Modal -->
+    <div class="privacy-modal" id="privacyModal">
+        <div class="privacy-content">
+            <h2>Privacy Policy & Terms of Use</h2>
+            <p><strong>HealthMama AI</strong> is designed to provide health information and support. Please read and accept our terms before using the service.</p>
+            
+            <h3>Data Collection & Privacy</h3>
+            <ul>
+                <li>We collect and store your chat conversations locally in your browser</li>
+                <li>No personal health data is transmitted to external servers beyond OpenAI's API</li>
+                <li>Your conversations are used solely to provide AI responses through OpenAI's services</li>
+                <li>We do not sell, share, or distribute your personal information</li>
+                <li>You can clear your chat history at any time</li>
+            </ul>
+
+            <h3>Medical Disclaimer</h3>
+            <ul>
+                <li>This AI assistant provides general health information only</li>
+                <li>It is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
+                <li>Always consult qualified healthcare providers for medical concerns</li>
+                <li>In case of medical emergencies, contact emergency services immediately</li>
+                <li>Do not rely solely on AI advice for health decisions</li>
+            </ul>
+
+            <h3>Usage Terms</h3>
+            <ul>
+                <li>Use this service responsibly and for lawful purposes only</li>
+                <li>Do not share sensitive personal information in chats</li>
+                <li>The service is provided "as is" without warranties</li>
+                <li>We reserve the right to modify or discontinue the service</li>
+            </ul>
+
+            <p><strong>By clicking "Accept", you acknowledge that you have read, understood, and agree to these terms.</strong></p>
+
+            <div class="privacy-buttons">
+                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">Accept & Continue</button>
+                <button class="privacy-decline" onclick="declinePrivacyPolicy()">Decline</button>
+            </div>
         </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+
+    <!-- Main Application -->
+    <div class="container" id="mainApp" style="opacity: 0.3; pointer-events: none;">
+        <div class="history-panel" id="historyPanel">
+            <button class="new-chat-button" onclick="clearChat(true)">
+                <i class="fa-solid fa-plus"></i> New Chat
+            </button>
+            <div class="history-list" id="historyList"></div>
+            <button class="clear-history-button" onclick="confirmClearAllHistory()">
+                <i class="fa-solid fa-trash"></i> Clear All History
+            </button>
+        </div>
+        
         <div class="main-chat">
             <div class="chat-header">
-                <img src="{{ url_for('static', filename='assets/healthmama-logo.png') }}" alt="Health Mama Logo" class="chat-logo" style="width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(33,150,243,0.13);margin-right:8px;object-fit:cover;" />
-                <h1>HealthMama Ai</h1>
-                <select id="modelSelect" style="margin-left:18px;padding:7px 16px;border-radius:8px;border:1.5px solid #b3e5fc;font-size:1rem;background:#e3f2fd;color:#1976d2;font-weight:600;outline:none;box-shadow:0 1px 4px rgba(33,150,243,0.07);cursor:pointer;" aria-label="Select AI Model">
+                <img src="{{ url_for('static', filename='assets/healthmama-logo.png') }}" alt="Health Mama Logo" class="chat-logo" />
+                <h1>HealthMama AI</h1>
+                <select id="modelSelect" aria-label="Select AI Model">
                     <option value="diabetes">Gestational Diabetes</option>
                     <option value="preeclampsia">Pre-eclampsia</option>
                 </select>
             </div>
+            
             <div class="messages" id="messages" aria-live="polite" aria-label="Chat messages"></div>
-            <button id="scrollLatest" style="display:none;position:absolute;right:24px;bottom:90px;z-index:2;background:#388e3c;color:#fff;border:none;border-radius:50%;width:38px;height:38px;box-shadow:0 2px 8px rgba(56,142,60,0.18);font-size:1.3rem;cursor:pointer;" title="Scroll to latest message" aria-label="Scroll to latest message"><i class="fa-solid fa-arrow-down"></i></button>
+            
+            <button id="scrollLatest" onclick="scrollToLatest()" title="Scroll to latest message" aria-label="Scroll to latest message">
+                <i class="fa-solid fa-arrow-down"></i>
+            </button>
+            
             <div class="typing-indicator" id="typingIndicator" aria-live="polite">
                 <span class="dot"></span>
                 <span class="dot"></span>
                 <span class="dot"></span>
             </div>
+            
             <div class="input-container">
-                <div style="position: relative; width: 100%; display: flex; align-items: center;">
-                    <label for="image-upload" class="image-upload-label" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; z-index: 2;">
-                        <i class="fa-solid fa-paperclip" style="font-size:1.2rem; color: #888;"></i>
+                <div class="input-wrapper">
+                    <label for="image-upload" class="image-upload-label">
+                        <i class="fa-solid fa-paperclip"></i>
                     </label>
-                    <input type="file" id="image-upload" accept="image/*" style="display:none;">
-                    <input type="text" id="query" placeholder="Ask HealthMama about preganancy, health, or nutrition..." required aria-label="Type your question here" style="padding-left: 36px;">
-                    <img id="image-preview" src="" alt="Image preview" style="display:none;max-width:38px;max-height:38px;margin-left:8px;border-radius:6px;border:1px solid #eee;vertical-align:middle;" />
-                    <button onclick="sendMessage()" aria-label="Send message" style="margin-left:8px;"><i class="fa-solid fa-paper-plane"></i></button>
-                    <button class="voice-record-button" aria-label="Record voice message" title="Record voice message"><i class="fa-solid fa-microphone"></i></button>
+                    <input type="file" id="image-upload" accept="image/*">
+                    <input type="text" id="query" placeholder="Ask HealthMama about pregnancy, health, or nutrition..." required aria-label="Type your question here">
                 </div>
-        <script>
-        // Audio recording logic
+                <img id="image-preview" src="" alt="Image preview" />
+                <button class="action-button send-button" onclick="sendMessage()" aria-label="Send message">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+                <button class="action-button voice-record-button" onclick="toggleVoiceRecording()" aria-label="Record voice message" title="Record voice message">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+            </div>
+            
+            <div class="caution-message">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                HealthMama AI can make mistakes. Check important info.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Privacy Policy Management
+        function checkPrivacyAcceptance() {
+            const accepted = localStorage.getItem('healthmama_privacy_accepted');
+            if (accepted === 'true') {
+                hidePrivacyModal();
+            } else {
+                showPrivacyModal();
+            }
+        }
+
+        function showPrivacyModal() {
+            document.getElementById('privacyModal').classList.add('show');
+            document.getElementById('mainApp').style.opacity = '0.3';
+            document.getElementById('mainApp').style.pointerEvents = 'none';
+        }
+
+        function hidePrivacyModal() {
+            document.getElementById('privacyModal').classList.remove('show');
+            document.getElementById('mainApp').style.opacity = '1';
+            document.getElementById('mainApp').style.pointerEvents = 'auto';
+        }
+
+        function acceptPrivacyPolicy() {
+            localStorage.setItem('healthmama_privacy_accepted', 'true');
+            hidePrivacyModal();
+        }
+
+        function declinePrivacyPolicy() {
+            alert('You must accept the privacy policy to use HealthMama AI. The page will now close.');
+            window.close();
+        }
+
+        // Dark Mode Management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('healthmama_theme') || 'light';
+            applyTheme(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem('healthmama_theme', newTheme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-moon';
+            } else {
+                icon.className = 'fas fa-sun';
+            }
+        }
+
+        // Voice Recording
         let mediaRecorder;
         let audioChunks = [];
-        const voiceBtn = document.querySelector('.voice-record-button');
         let isRecording = false;
-        let audioBlob = null;
-        // Visual indicator
-        const recordingIndicator = document.createElement('span');
-        recordingIndicator.textContent = '● Recording...';
-        recordingIndicator.style.color = '#d32f2f';
-        recordingIndicator.style.fontWeight = 'bold';
-        recordingIndicator.style.marginLeft = '10px';
-        voiceBtn.parentNode.appendChild(recordingIndicator);
-        recordingIndicator.style.display = 'none';
 
-        voiceBtn.onclick = async function() {
+        async function toggleVoiceRecording() {
             if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    sendAudioMessage(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                
+                const voiceBtn = document.querySelector('.voice-record-button');
+                voiceBtn.classList.add('recording');
+                
+            } catch (err) {
+                alert('Could not access microphone: ' + err.message);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                voiceBtn.style.background = '';
-                recordingIndicator.style.display = 'none';
-            } else {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert('Audio recording not supported in this browser.');
-                    return;
-                }
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    mediaRecorder.ondataavailable = e => {
-                        if (e.data.size > 0) audioChunks.push(e.data);
-                    };
-                    mediaRecorder.onstop = () => {
-                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        sendAudioMessage(audioBlob);
-                    };
-                    mediaRecorder.start();
-                    isRecording = true;
-                    voiceBtn.style.background = '#ffe082';
-                    recordingIndicator.style.display = 'inline-block';
-                } catch (err) {
-                    alert('Could not start audio recording: ' + err);
-                }
+                
+                const voiceBtn = document.querySelector('.voice-record-button');
+                voiceBtn.classList.remove('recording');
             }
-        };
+        }
 
         function sendAudioMessage(blob) {
+            const typingIndicator = document.getElementById('typingIndicator');
             typingIndicator.style.display = 'block';
+            
             const formData = new FormData();
             formData.append('audio', blob, 'audio.webm');
             formData.append('model', selectedModel);
+            
             fetch('/ask', {
                 method: 'POST',
                 body: formData
@@ -634,9 +1092,11 @@
                 appendMessage('Error: ' + error, false);
             });
         }
-        // Image upload preview logic
+
+        // Image Upload Preview
         const imageInput = document.getElementById('image-upload');
         const imagePreview = document.getElementById('image-preview');
+
         imageInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
@@ -650,26 +1110,12 @@
                 imagePreview.style.display = 'none';
             }
         });
-        </script>
-            </div>
-            <div class="caution-message" style="margin: 8px auto 0 auto; max-width: 480px; color: #b26a00; background: #fff8e1; border: 1px solid #ffe0b2; border-radius: 7px; padding: 4px 10px; font-size: 0.85rem; text-align: center; box-shadow: 0 1px 4px rgba(255,193,7,0.07); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <i class="fa-solid fa-triangle-exclamation" style="margin-right: 7px;"></i>
-                HealthMamaAi can make mistakes. Check important info.
-            </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        // Confirm before clearing all history
-        function confirmClearAllHistory() {
-            if (confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
-                clearAllHistory();
-            }
-        }
-        // Model selection logic
+
+        // Model Selection and Chat Logic
         let selectedModel = localStorage.getItem('selectedModel') || 'diabetes';
         const modelSelect = document.getElementById('modelSelect');
         modelSelect.value = selectedModel;
+
         function setThemeByModel() {
             document.body.classList.remove('diabetes-theme', 'preeclampsia-theme');
             if (selectedModel === 'preeclampsia') {
@@ -678,7 +1124,9 @@
                 document.body.classList.add('diabetes-theme');
             }
         }
+
         setThemeByModel();
+
         modelSelect.addEventListener('change', function() {
             selectedModel = this.value;
             localStorage.setItem('selectedModel', selectedModel);
@@ -686,156 +1134,85 @@
             showWelcome();
             loadModelChatHistory();
         });
-        // Separate chat history per model
+
+        // Chat History Management
         let chatHistoryAll = JSON.parse(localStorage.getItem('chatHistoryAll')) || {};
         if (!chatHistoryAll[selectedModel]) chatHistoryAll[selectedModel] = {};
-    let chatHistory = chatHistoryAll[selectedModel];
-    let firstPrompt = '';
-        function saveChatHistory(title) {
-            const messages = messagesElement.innerHTML;
-            chatHistory[title] = messages;
-            chatHistoryAll[selectedModel] = chatHistory;
-            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-            updateHistoryList();
-        }
-        function loadModelChatHistory() {
-            chatHistory = chatHistoryAll[selectedModel] || {};
-            updateHistoryList();
-            // Load the most recent chat for this model, or show welcome if none
-            const titles = Object.keys(chatHistory);
-            if (titles.length > 0) {
-                // Find the most recently updated chat (by insertion order)
-                const lastTitle = titles[titles.length - 1];
-                loadChat(lastTitle);
-                firstPrompt = lastTitle;
-            } else {
-                showWelcome();
-            }
-        }
-        function deleteChat(title) {
-            delete chatHistory[title];
-            chatHistoryAll[selectedModel] = chatHistory;
-            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-            updateHistoryList();
-            if (messagesElement.innerHTML === chatHistory[title]) {
-                messagesElement.innerHTML = '';
-            }
-        }
-        function clearAllHistory() {
-            chatHistory = {};
-            chatHistoryAll[selectedModel] = chatHistory;
-            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-            updateHistoryList();
-            messagesElement.innerHTML = '';
-        }
+        let chatHistory = chatHistoryAll[selectedModel];
+        let firstPrompt = '';
+
         const messagesElement = document.getElementById('messages');
         const typingIndicator = document.getElementById('typingIndicator');
         const queryInput = document.getElementById('query');
         const historyList = document.getElementById('historyList');
-    // (Removed duplicate declaration of chatHistory and firstPrompt)
 
         function appendMessage(content, isUser) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', isUser ? 'user' : 'bot');
+
             // Avatar
             const avatar = document.createElement('div');
             avatar.classList.add('avatar');
             if (isUser) {
                 avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
-                avatar.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-user' : 'diabetes-user');
             } else {
-                avatar.innerHTML = selectedModel === 'preeclampsia' ? '<i class="fa-solid fa-baby"></i>' : '<i class="fa-solid fa-user-doctor"></i>';
-                avatar.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-bot' : 'diabetes-bot');
+                avatar.innerHTML = selectedModel === 'preeclampsia' ? 
+                    '<i class="fa-solid fa-baby"></i>' : 
+                    '<i class="fa-solid fa-user-doctor"></i>';
             }
             messageElement.appendChild(avatar);
+
             // Content
             const contentElement = document.createElement('div');
             contentElement.classList.add('content');
-            if (isUser) {
-                contentElement.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-user' : 'diabetes-user');
-            } else {
-                contentElement.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-bot' : 'diabetes-bot');
-            }
             contentElement.textContent = content;
             messageElement.appendChild(contentElement);
 
-            // Add edit button for user messages
+            // Edit button for user messages
             if (isUser) {
                 const editBtn = document.createElement('button');
                 editBtn.className = 'edit-btn';
                 editBtn.title = 'Edit and regenerate';
                 editBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
                 editBtn.onclick = function() {
-                    // Replace content with a container holding the input and send button
+                    // Edit functionality implementation
                     const editWrapper = document.createElement('div');
                     editWrapper.style.display = 'flex';
                     editWrapper.style.alignItems = 'center';
                     editWrapper.style.width = '100%';
-                    editWrapper.style.gap = '0';
+                    
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.value = contentElement.textContent;
                     input.className = 'edit-input';
                     input.style.flex = '1';
-                    // Add send (paper plane) button
+                    
                     const sendBtn = document.createElement('button');
                     sendBtn.className = 'save-btn';
                     sendBtn.title = 'Send edited prompt';
                     sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
                     sendBtn.style.marginLeft = '8px';
-                    sendBtn.onclick = saveEdit;
-                    // Enter key submits edit
+                    
+                    sendBtn.onclick = () => {
+                        const newPrompt = input.value.trim();
+                        if (!newPrompt) return;
+                        
+                        // Replace input with new content
+                        contentElement.textContent = newPrompt;
+                        editWrapper.replaceWith(contentElement);
+                        editBtn.style.display = '';
+                        
+                        // Regenerate response
+                        regenerateResponse(messageElement, newPrompt);
+                    };
+                    
                     input.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                             sendBtn.click();
                         }
                     });
-                    function saveEdit() {
-                        const newPrompt = input.value.trim();
-                        if (!newPrompt) return;
-                        // Find index of this user message in the chat
-                        const allMessages = Array.from(messagesElement.children);
-                        const idx = allMessages.indexOf(messageElement);
-                        // Remove all messages after this one
-                        while (messagesElement.children.length > idx + 2) {
-                            messagesElement.removeChild(messagesElement.lastChild);
-                        }
-                        // Replace input with new content
-                        const newContent = document.createElement('div');
-                        newContent.className = contentElement.className;
-                        newContent.textContent = newPrompt;
-                        editWrapper.replaceWith(newContent);
-                        editBtn.style.display = '';
-                        // Regenerate response
-                        typingIndicator.style.display = 'block';
-                        // Gather conversation up to this point
-                        const convo = [];
-                        for (let i = 0; i <= idx; i++) {
-                            const msg = messagesElement.children[i];
-                            const isU = msg.classList.contains('user');
-                            const text = msg.querySelector('.content') ? msg.querySelector('.content').textContent : '';
-                            convo.push({role: isU ? 'user' : 'assistant', content: text});
-                        }
-                        fetch('/ask', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                            body: 'query=' + encodeURIComponent(newPrompt) + '&model=' + encodeURIComponent(selectedModel)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            typingIndicator.style.display = 'none';
-                            // Remove old bot response if present
-                            if (messagesElement.children[idx+1] && messagesElement.children[idx+1].classList.contains('bot')) {
-                                messagesElement.removeChild(messagesElement.children[idx+1]);
-                            }
-                            appendMessage(data.response, false);
-                        })
-                        .catch(error => {
-                            typingIndicator.style.display = 'none';
-                            appendMessage('Error: ' + error, false);
-                        });
-                    }
+                    
                     editWrapper.appendChild(input);
                     editWrapper.appendChild(sendBtn);
                     contentElement.replaceWith(editWrapper);
@@ -844,22 +1221,54 @@
                 };
                 messageElement.appendChild(editBtn);
             }
+
             messagesElement.appendChild(messageElement);
             scrollToLatest();
         }
-        // Welcome message
+
+        function regenerateResponse(userMessageElement, newPrompt) {
+            typingIndicator.style.display = 'block';
+            
+            // Remove subsequent messages
+            let nextElement = userMessageElement.nextElementSibling;
+            while (nextElement) {
+                const toRemove = nextElement;
+                nextElement = nextElement.nextElementSibling;
+                toRemove.remove();
+            }
+            
+            // Send new request
+            const formData = new FormData();
+            formData.append('query', newPrompt);
+            formData.append('model', selectedModel);
+            
+            fetch('/ask', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                typingIndicator.style.display = 'none';
+                appendMessage(data.response, false);
+            })
+            .catch(error => {
+                typingIndicator.style.display = 'none';
+                appendMessage('Error: ' + error, false);
+            });
+        }
+
         function showWelcome() {
             messagesElement.innerHTML = '';
             if (selectedModel === 'preeclampsia') {
-                appendMessage("👋 Welcome to HealthMama Ai!\n\nAsk me anything about preeclampsia, maternal health, or pregnancy. I'm here to help you with evidence-based answers.", false);
+                appendMessage("👋 Welcome to HealthMama AI!\n\nAsk me anything about preeclampsia, maternal health, or pregnancy. I'm here to help you with evidence-based answers.", false);
             } else {
-                appendMessage("👋 Welcome to HealthMama Ai!\n\nAsk me anything about diabetes, health, or nutrition. I'm here to help you with evidence-based answers.", false);
+                appendMessage("👋 Welcome to HealthMama AI!\n\nAsk me anything about diabetes, health, or nutrition. I'm here to help you with evidence-based answers.", false);
             }
         }
-        // Scroll to latest message
+
         function scrollToLatest() {
             messagesElement.scrollTop = messagesElement.scrollHeight;
-            // Show/hide scroll button
+            
             const scrollBtn = document.getElementById('scrollLatest');
             if (messagesElement.scrollHeight - messagesElement.clientHeight > 100) {
                 scrollBtn.style.display = 'block';
@@ -867,46 +1276,33 @@
                 scrollBtn.style.display = 'none';
             }
         }
-        document.getElementById('scrollLatest').onclick = scrollToLatest;
 
         function saveChatHistory(title) {
             const messages = messagesElement.innerHTML;
             chatHistory[title] = messages;
-            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+            chatHistoryAll[selectedModel] = chatHistory;
+            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
             updateHistoryList();
         }
 
         function loadChat(title) {
             if (chatHistory[title]) {
                 messagesElement.innerHTML = chatHistory[title];
-                // Add avatars and color classes back to loaded messages (for backward compatibility)
-                const msgDivs = messagesElement.querySelectorAll('.message');
-                msgDivs.forEach(div => {
-                    if (!div.querySelector('.avatar')) {
-                        const isUser = div.classList.contains('user');
-                        const avatar = document.createElement('div');
-                        avatar.classList.add('avatar');
-                        if (isUser) {
-                            avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
-                            avatar.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-user' : 'diabetes-user');
-                        } else {
-                            avatar.innerHTML = selectedModel === 'preeclampsia' ? '<i class="fa-solid fa-baby"></i>' : '<i class="fa-solid fa-user-doctor"></i>';
-                            avatar.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-bot' : 'diabetes-bot');
-                        }
-                        div.insertBefore(avatar, div.firstChild);
-                    }
-                    // Add color classes to content
-                    const content = div.querySelector('.content');
-                    if (content) {
-                        const isUser = div.classList.contains('user');
-                        if (isUser) {
-                            content.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-user' : 'diabetes-user');
-                        } else {
-                            content.classList.add(selectedModel === 'preeclampsia' ? 'preeclampsia-bot' : 'diabetes-bot');
-                        }
-                    }
-                });
                 scrollToLatest();
+            }
+        }
+
+        function loadModelChatHistory() {
+            chatHistory = chatHistoryAll[selectedModel] || {};
+            updateHistoryList();
+            
+            const titles = Object.keys(chatHistory);
+            if (titles.length > 0) {
+                const lastTitle = titles[titles.length - 1];
+                loadChat(lastTitle);
+                firstPrompt = lastTitle;
+            } else {
+                showWelcome();
             }
         }
 
@@ -915,18 +1311,24 @@
             for (const title in chatHistory) {
                 const item = document.createElement('div');
                 item.classList.add('history-item');
-                item.textContent = title;
+                item.textContent = title.length > 30 ? title.substring(0, 30) + '...' : title;
 
                 const moreOptions = document.createElement('div');
                 moreOptions.classList.add('more-options');
                 moreOptions.textContent = '⋮';
-                moreOptions.onclick = () => toggleMenu(item);
+                moreOptions.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleMenu(item);
+                };
 
                 const moreOptionsMenu = document.createElement('div');
                 moreOptionsMenu.classList.add('more-options-menu');
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete Chat';
-                deleteButton.onclick = () => deleteChat(title);
+                deleteButton.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteChat(title);
+                };
                 moreOptionsMenu.appendChild(deleteButton);
 
                 item.appendChild(moreOptions);
@@ -934,7 +1336,7 @@
 
                 item.onclick = () => {
                     loadChat(title);
-                    firstPrompt = title; // Set the first prompt to the chat title when loaded
+                    firstPrompt = title;
                 };
 
                 historyList.appendChild(item);
@@ -943,7 +1345,54 @@
 
         function toggleMenu(item) {
             const menu = item.querySelector('.more-options-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            const isVisible = menu.style.display === 'block';
+            
+            // Hide all other menus
+            document.querySelectorAll('.more-options-menu').forEach(m => m.style.display = 'none');
+            
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function deleteChat(title) {
+            if (confirm('Are you sure you want to delete this chat?')) {
+                delete chatHistory[title];
+                chatHistoryAll[selectedModel] = chatHistory;
+                localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
+                updateHistoryList();
+                
+                if (firstPrompt === title) {
+                    showWelcome();
+                    firstPrompt = '';
+                }
+            }
+        }
+
+        function confirmClearAllHistory() {
+            if (confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+                clearAllHistory();
+            }
+        }
+
+        function clearAllHistory() {
+            chatHistory = {};
+            chatHistoryAll[selectedModel] = chatHistory;
+            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
+            updateHistoryList();
+            showWelcome();
+            firstPrompt = '';
+        }
+
+        function clearChat(forceNew = false) {
+            const chatTitle = firstPrompt || 'Chat_' + new Date().toISOString();
+            if (messagesElement.innerHTML.trim() !== '') {
+                saveChatHistory(chatTitle);
+            }
+            showWelcome();
+            queryInput.value = '';
+            firstPrompt = '';
+            if (forceNew) {
+                queryInput.focus();
+            }
         }
 
         function sendMessage() {
@@ -953,7 +1402,7 @@
             }
 
             if (!firstPrompt) {
-                firstPrompt = query;
+                firstPrompt = query.substring(0, 50);
             }
 
             appendMessage(query, true);
@@ -976,6 +1425,7 @@
             .then(data => {
                 typingIndicator.style.display = 'none';
                 appendMessage(data.response, false);
+                
                 // Clear image preview and file input
                 imagePreview.src = '';
                 imagePreview.style.display = 'none';
@@ -987,47 +1437,26 @@
             });
         }
 
-        function clearChat(forceNew = false) {
-            // Always save the current chat to history before starting a new one
-            const chatTitle = firstPrompt || 'Chat_' + new Date().toISOString();
-            if (messagesElement.innerHTML.trim() !== '') {
-                saveChatHistory(chatTitle);
-            }
-            showWelcome();
-            queryInput.value = '';
-            firstPrompt = '';
-            if (forceNew) {
-                // Optionally scroll to top of chat history or focus input
-                queryInput.focus();
-            }
-        }
-
-        function deleteChat(title) {
-            delete chatHistory[title];
-            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-            updateHistoryList();
-            if (messagesElement.innerHTML === chatHistory[title]) {
-                messagesElement.innerHTML = '';
-            }
-        }
-
-        function clearAllHistory() {
-            chatHistory = {};
-            localStorage.removeItem('chatHistory');
-            updateHistoryList();
-            messagesElement.innerHTML = '';
-        }
-
+        // Event Listeners
         queryInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        updateHistoryList(); // Load history on page load
-        showWelcome();
-        // Accessibility: focus input on load
-        window.onload = () => {
+        // Close menus when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.more-options-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        });
+
+        // Initialize App
+        window.onload = function() {
+            initializeTheme();
+            checkPrivacyAcceptance();
+            updateHistoryList();
+            showWelcome();
             queryInput.focus();
         };
     </script>
