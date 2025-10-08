@@ -1,0 +1,13 @@
+# Lightweight requirements for Railway free tier (under 4GB)
+Flask==3.1.1
+Flask-Session==0.8.0
+gunicorn==23.0.0
+python-dotenv==1.1.1
+openai==0.28.0
+requests==2.32.3
+numpy==2.2.5
+scikit-learn==1.6.1
+# Using CPU-only PyTorch to save space
+torch==2.7.0+cpu --find-links https://download.pytorch.org/whl/torch_stable.html
+# Lightweight sentence transformers alternative
+sentence-transformers==4.1.0
