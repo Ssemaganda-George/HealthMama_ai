@@ -22,8 +22,11 @@
             --border-radius: 16px;
             --border-radius-small: 8px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            /* Medical Professional Colors - Solid */
+            --medical-navy: #003366;
+            --medical-teal: #006666;
+            --medical-light-blue: #4A90A4;
+            --medical-light-teal: #5CAAAA;
         }
 
         [data-theme="dark"] {
@@ -73,19 +76,7 @@
 
         /* Header Styles */
         .header {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 1.5rem 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Header Styles */
-        .header {
-            background: var(--gradient-primary);
+            background: var(--medical-navy);
             color: white;
             padding: 0.75rem 0;
             position: sticky;
@@ -298,12 +289,13 @@
         }
 
         .btn-primary {
-            background: var(--gradient-primary);
+            background: var(--medical-navy);
             color: white;
             box-shadow: var(--shadow);
         }
 
         .btn-primary:hover {
+            background: var(--medical-light-blue);
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
         }
@@ -322,12 +314,13 @@
         }
 
         .btn-danger {
-            background: var(--gradient-secondary);
+            background: var(--accent-color);
             color: white;
             box-shadow: var(--shadow);
         }
 
         .btn-danger:hover {
+            background: #c0392b;
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
         }
@@ -356,7 +349,7 @@
         .welcome-section h2 {
             font-size: 1.5rem;
             margin-bottom: 0.75rem;
-            background: var(--gradient-primary);
+            background: var(--medical-navy);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -487,6 +480,22 @@
             word-wrap: break-word;
             font-size: 0.9rem;
             line-height: 1.4;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .message:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .message.user:hover {
+            background: var(--secondary-color);
+        }
+
+        .message.assistant:hover {
+            background: var(--surface-color);
+            border-color: var(--secondary-color);
         }
 
         .message::before {
@@ -500,7 +509,7 @@
         }
 
         .message.user {
-            background: var(--gradient-primary);
+            background: var(--primary-color);
             color: white;
             margin-left: auto;
             box-shadow: var(--shadow);
@@ -589,6 +598,11 @@
             background: var(--secondary-color);
             color: white;
             transform: scale(1.1);
+            box-shadow: var(--shadow);
+        }
+
+        .input-btn:active {
+            transform: scale(0.95);
         }
 
         .input-btn.recording {
@@ -670,29 +684,36 @@
             border-color: var(--secondary-color);
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
+            background: white;
         }
 
         /* Theme variations for different models */
         .diabetes-theme {
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-color: #1976d2;
-            --secondary-color: #3498db;
+            --primary-color: var(--medical-navy);
+            --secondary-color: var(--medical-light-blue);
             --accent-color: #e74c3c;
         }
 
+        .diabetes-theme .header {
+            background: var(--medical-navy);
+        }
+
         .preeclampsia-theme {
-            --gradient-primary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --primary-color: #8e24aa;
-            --secondary-color: #ab47bc;
+            --primary-color: var(--medical-teal);
+            --secondary-color: var(--medical-light-teal);
             --accent-color: #f06292;
         }
 
+        .preeclampsia-theme .header {
+            background: var(--medical-teal);
+        }
+
         .diabetes-theme .message.assistant::before {
-            background: #1976d2;
+            background: var(--medical-navy);
         }
 
         .preeclampsia-theme .message.assistant::before {
-            background: #8e24aa;
+            background: var(--medical-teal);
         }
 
         .model-indicator {
@@ -714,15 +735,15 @@
         }
 
         .diabetes-theme .model-indicator {
-            background: linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
-            color: #1976d2;
-            border: 2px solid rgba(25, 118, 210, 0.2);
+            background: var(--medical-navy);
+            color: white;
+            border: 2px solid var(--medical-light-blue);
         }
 
         .preeclampsia-theme .model-indicator {
-            background: linear-gradient(135deg, rgba(142, 36, 170, 0.1) 0%, rgba(171, 71, 188, 0.1) 100%);
-            color: #8e24aa;
-            border: 2px solid rgba(142, 36, 170, 0.2);
+            background: var(--medical-teal);
+            color: white;
+            border: 2px solid var(--medical-light-teal);
         }
 
         /* Security notice */
@@ -784,6 +805,17 @@
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-6px); }
+        }
+
+        @keyframes typingDots {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
         }
 
         .float-animation {
@@ -912,6 +944,37 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            max-width: 85%;
+            box-shadow: var(--shadow);
+        }
+
+        .typing-indicator .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            animation: typingDots 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-indicator .dot:nth-child(3) { animation-delay: 0s; }
 
         /* Animations */
         @keyframes slideIn {
@@ -1196,6 +1259,17 @@
                 <div class="chat-messages" id="chatMessages">
                     <div class="message assistant">
                         <i class="fas fa-robot"></i> Hello! I'm HealthMama AI, your trusted health companion. I'm here to help with questions about pregnancy, diabetes management, and maternal health. How can I assist you today?
+                    </div>
+                </div>
+                
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <i class="fas fa-robot"></i>
+                    <span>HealthMama is typing</span>
+                    <div class="typing-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
                     </div>
                 </div>
                 
@@ -1618,8 +1692,8 @@
         }
 
         function sendAudioMessage(audioBlob) {
-            // Show loading indicator
-            document.getElementById('loadingIndicator').style.display = 'flex';
+            // Show typing indicator
+            showTypingIndicator();
             document.getElementById('sendButton').disabled = true;
             
             // Create FormData for audio upload
@@ -1634,14 +1708,16 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Hide loading indicator
-                document.getElementById('loadingIndicator').style.display = 'none';
+                // Hide typing indicator
+                hideTypingIndicator();
                 document.getElementById('sendButton').disabled = false;
                 
                 if (data.response) {
                     // Add user message placeholder for voice
                     addMessage('🎤 Voice message sent', 'user');
-                    addMessage(data.response, 'assistant');
+                    setTimeout(() => {
+                        addMessage(data.response, 'assistant');
+                    }, 500);
                     
                     // Play audio response if available
                     if (data.audio_url) {
@@ -1649,14 +1725,18 @@
                         audio.play().catch(e => console.log('Audio playback failed:', e));
                     }
                 } else {
-                    addMessage('I apologize, but I encountered an error processing your voice message.', 'assistant');
+                    setTimeout(() => {
+                        addMessage('I apologize, but I encountered an error processing your voice message.', 'assistant');
+                    }, 500);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                hideTypingIndicator();
                 document.getElementById('sendButton').disabled = false;
-                addMessage('I apologize, but I encountered a connection error with your voice message.', 'assistant');
+                setTimeout(() => {
+                    addMessage('I apologize, but I encountered a connection error with your voice message.', 'assistant');
+                }, 500);
             });
         }
 
@@ -1685,8 +1765,8 @@
             
             userInput.value = '';
             
-            // Show loading indicator
-            document.getElementById('loadingIndicator').style.display = 'flex';
+            // Show typing indicator
+            showTypingIndicator();
             document.getElementById('sendButton').disabled = true;
             
             // Prepare data for sending
@@ -1727,12 +1807,15 @@
             fetch(endpoint, requestOptions)
             .then(response => response.json())
             .then(data => {
-                // Hide loading indicator
-                document.getElementById('loadingIndicator').style.display = 'none';
+                // Hide typing indicator
+                hideTypingIndicator();
                 document.getElementById('sendButton').disabled = false;
                 
                 if (data.response) {
-                    addMessage(data.response, 'assistant');
+                    // Simulate typing delay for better UX
+                    setTimeout(() => {
+                        addMessage(data.response, 'assistant');
+                    }, 500);
                     
                     // Play audio response if available
                     if (data.audio_url) {
@@ -1740,7 +1823,9 @@
                         audio.play().catch(e => console.log('Audio playback failed:', e));
                     }
                 } else {
-                    addMessage('I apologize, but I encountered an error. Please try again.', 'assistant');
+                    setTimeout(() => {
+                        addMessage('I apologize, but I encountered an error. Please try again.', 'assistant');
+                    }, 500);
                 }
                 
                 // Clear image selection
@@ -1750,9 +1835,11 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                hideTypingIndicator();
                 document.getElementById('sendButton').disabled = false;
-                addMessage('I apologize, but I encountered a connection error. Please check your internet connection and try again.', 'assistant');
+                setTimeout(() => {
+                    addMessage('I apologize, but I encountered a connection error. Please check your internet connection and try again.', 'assistant');
+                }, 500);
                 
                 // Clear image selection on error too
                 if (selectedImage) {
@@ -1775,6 +1862,10 @@
             }
             
             messageDiv.innerHTML = `${icon} ${message.replace(/\n/g, '<br>')}`;
+            
+            // Add click-to-copy functionality
+            messageDiv.addEventListener('click', () => copyMessage(messageDiv));
+            messageDiv.title = 'Click to copy message';
             
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1882,6 +1973,71 @@
             
             // Close mobile menu if open
             document.getElementById('mobileMenuDropdown').classList.remove('active');
+        }
+
+        // Typing Indicator Functions
+        function showTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            typingIndicator.style.display = 'flex';
+            
+            // Scroll to bottom to show typing indicator
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            typingIndicator.style.display = 'none';
+        }
+
+        // Enhanced Message Copy Functionality
+        function copyMessage(messageElement) {
+            const text = messageElement.textContent || messageElement.innerText;
+            const cleanText = text.replace(/^[^\s]+\s/, ''); // Remove icon
+            
+            navigator.clipboard.writeText(cleanText).then(() => {
+                showNotification('Message copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy message', 'error');
+            });
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--accent-color)' : 'var(--primary-color)'};
+                color: white;
+                border-radius: var(--border-radius-small);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                transform: translateX(400px);
+                transition: var(--transition);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Slide out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
