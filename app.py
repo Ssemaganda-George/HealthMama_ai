@@ -8,13 +8,20 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='Templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', b'\xdb\x908\x9bsKD\x1c\x91\x8a\xd84\x01\xcb\xa5]\x8b\xa9n\x10\xd7\x1e\x11g')
 
 # Load cleaned data
 def load_cleaned_data(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.readlines()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.readlines()
+    except FileNotFoundError:
+        print(f"Warning: Data file not found: {file_path}")
+        return []
+    except Exception as e:
+        print(f"Error loading data from {file_path}: {e}")
+        return []
 
 # Simplified context retrieval using keyword matching instead of embeddings
 def retrieve_context_simple(query, data, top_n=5):
@@ -87,7 +94,22 @@ def generate_response_with_openai(conversation_history, model='diabetes'):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        return f"HealthMama AI is running, but template error: {str(e)}", 200
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Railway"""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'HealthMama AI is running',
+        'data_loaded': {
+            'diabetes': len(diabetes_data),
+            'preeclampsia': len(preeclampsia_data)
+        }
+    }), 200
 
 @app.route('/chat', methods=['POST'])
 def chat():
