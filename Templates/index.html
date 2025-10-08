@@ -121,8 +121,8 @@
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 2rem;
-            max-width: min(90vw, 500px);
-            max-height: 80vh;
+            max-width: min(90vw, 600px);
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
@@ -132,26 +132,44 @@
         .privacy-content h2 {
             color: var(--color-primary);
             margin-bottom: 1rem;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
         }
 
         .privacy-summary {
             color: var(--color-text);
             line-height: 1.6;
             margin-bottom: 1.5rem;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .privacy-details {
             display: none;
             text-align: left;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border-color);
         }
 
         .privacy-details.show {
             display: block;
+        }
+
+        .privacy-details h3 {
+            color: var(--color-primary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .privacy-details ul {
+            margin: 0.5rem 0 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .privacy-details li {
+            margin-bottom: 0.4rem;
+            line-height: 1.5;
+            color: var(--color-text);
         }
 
         .privacy-content p {
@@ -897,51 +915,105 @@
             <h2>Welcome to HealthMama AI</h2>
             
             <div class="privacy-summary">
-                <p>🏥 <strong>Medical AI Assistant</strong> for pregnancy and health information</p>
-                <p>💭 Your conversations stay private and are stored locally in your browser</p>
-                <p>⚠️ <strong>Important:</strong> This is for informational purposes only - not a substitute for professional medical advice</p>
-                <p>🔒 We respect your privacy and don't share your personal information</p>
+                <div style="text-align: left; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">🏥</span>
+                        <span><strong>AI-Powered Health Assistant</strong> specializing in maternal health, diabetes, and pregnancy information</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">🔒</span>
+                        <span><strong>Privacy Protected:</strong> All conversations are stored locally in your browser and remain private</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">⚠️</span>
+                        <span><strong>Medical Disclaimer:</strong> This service provides educational information only - not medical diagnosis or treatment</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center;">
+                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">✨</span>
+                        <span><strong>Professional Standards:</strong> Built with healthcare compliance and ethical AI principles</span>
+                    </div>
+                </div>
             </div>
 
             <button class="view-details-btn" onclick="togglePrivacyDetails()" id="viewDetailsBtn">
-                📋 View Full Terms & Privacy Policy
+                📋 View Complete Terms & Privacy Policy
             </button>
 
             <div class="privacy-details" id="privacyDetails">
-                <h3>Data Collection & Privacy</h3>
-                <ul>
-                    <li>We collect and store your chat conversations locally in your browser</li>
-                    <li>No personal health data is transmitted to external servers beyond OpenAI's API</li>
-                    <li>Your conversations are used solely to provide AI responses through OpenAI's services</li>
-                    <li>We do not sell, share, or distribute your personal information</li>
-                    <li>You can clear your chat history at any time</li>
-                </ul>
+                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">🔐 Data Privacy & Collection</h3>
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 0.5rem; font-weight: 600;">Information We Collect:</p>
+                    <ul style="margin-left: 1rem;">
+                        <li>Chat conversations and queries you submit to our AI assistant</li>
+                        <li>Local browser preferences and settings for improved user experience</li>
+                        <li>Anonymous usage patterns to enhance service quality</li>
+                    </ul>
+                    
+                    <p style="margin: 1rem 0 0.5rem; font-weight: 600;">Data Protection:</p>
+                    <ul style="margin-left: 1rem;">
+                        <li><strong>Local Storage:</strong> All chat history is stored locally in your browser only</li>
+                        <li><strong>Secure Processing:</strong> Conversations are processed through OpenAI's encrypted API</li>
+                        <li><strong>No Data Sales:</strong> We never sell, share, or distribute your personal information</li>
+                        <li><strong>User Control:</strong> You can delete your chat history at any time</li>
+                        <li><strong>No External Tracking:</strong> We do not use third-party analytics or tracking tools</li>
+                    </ul>
+                </div>
 
-                <h3>Medical Disclaimer</h3>
-                <ul>
-                    <li>This AI assistant provides general health information only</li>
-                    <li>It is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
-                    <li>Always consult qualified healthcare providers for medical concerns</li>
-                    <li>In case of medical emergencies, contact emergency services immediately</li>
-                    <li>Do not rely solely on AI advice for health decisions</li>
-                </ul>
+                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">⚕️ Medical Disclaimer & Limitations</h3>
+                <div style="margin-bottom: 1.5rem; background: var(--bg-panel); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: #ff9800;">IMPORTANT MEDICAL NOTICE:</p>
+                    <ul style="margin-left: 1rem;">
+                        <li><strong>Educational Purpose Only:</strong> This AI provides general health information for educational purposes</li>
+                        <li><strong>Not Medical Advice:</strong> Content is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
+                        <li><strong>Consult Healthcare Providers:</strong> Always seek advice from qualified healthcare professionals for medical concerns</li>
+                        <li><strong>Emergency Situations:</strong> For medical emergencies, immediately contact emergency services (911)</li>
+                        <li><strong>Individual Variation:</strong> Health information may not apply to your specific medical situation</li>
+                        <li><strong>No Doctor-Patient Relationship:</strong> Use of this service does not create a medical relationship</li>
+                    </ul>
+                </div>
 
-                <h3>Usage Terms</h3>
-                <ul>
-                    <li>Use this service responsibly and for lawful purposes only</li>
-                    <li>Do not share sensitive personal information in chats</li>
-                    <li>The service is provided "as is" without warranties</li>
-                    <li>We reserve the right to modify or discontinue the service</li>
-                </ul>
+                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">📋 Terms of Service</h3>
+                <div style="margin-bottom: 1rem;">
+                    <p style="margin-bottom: 0.5rem; font-weight: 600;">Acceptable Use:</p>
+                    <ul style="margin-left: 1rem;">
+                        <li><strong>Lawful Purpose:</strong> Use this service only for legitimate, lawful health information purposes</li>
+                        <li><strong>Personal Use:</strong> Service is intended for individual, non-commercial use only</li>
+                        <li><strong>No Misuse:</strong> Do not attempt to exploit, hack, or abuse the service</li>
+                        <li><strong>Respectful Interaction:</strong> Engage with the AI assistant in a respectful manner</li>
+                    </ul>
+                    
+                    <p style="margin: 1rem 0 0.5rem; font-weight: 600;">Service Limitations:</p>
+                    <ul style="margin-left: 1rem;">
+                        <li><strong>As-Is Basis:</strong> Service is provided "as is" without warranties of any kind</li>
+                        <li><strong>Availability:</strong> We do not guarantee uninterrupted service availability</li>
+                        <li><strong>Modifications:</strong> We reserve the right to modify or discontinue the service</li>
+                        <li><strong>Content Accuracy:</strong> While we strive for accuracy, AI responses may contain errors</li>
+                    </ul>
+                </div>
+
+                <div style="background: var(--bg-input); padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-light); text-align: center;">
+                        <strong>Last Updated:</strong> October 2025 | <strong>Version:</strong> 2.0<br>
+                        For questions about this policy, contact our support team.
+                    </p>
+                </div>
             </div>
 
-            <p style="font-size: 0.9rem; color: var(--color-text-light); margin: 1.5rem 0 0.5rem;">
-                By continuing, you acknowledge that you understand this is an AI assistant for informational purposes only.
-            </p>
+            <div style="background: var(--bg-panel); padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid var(--color-primary);">
+                <p style="margin: 0; font-size: 0.95rem; color: var(--color-text);">
+                    <strong>By continuing, you acknowledge that:</strong><br>
+                    • You have read and understand this privacy policy and terms of service<br>
+                    • You understand this is an AI assistant for informational purposes only<br>
+                    • You will not use this service as a substitute for professional medical care
+                </p>
+            </div>
 
             <div class="privacy-buttons">
-                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">✅ I Understand - Continue</button>
-                <button class="privacy-decline" onclick="declinePrivacyPolicy()">❌ No Thanks</button>
+                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">✅ I Accept - Continue to HealthMama AI</button>
+                <button class="privacy-decline" onclick="declinePrivacyPolicy()">❌ Decline</button>
             </div>
         </div>
     </div>
@@ -1048,10 +1120,10 @@
             
             if (details.classList.contains('show')) {
                 details.classList.remove('show');
-                btn.textContent = '📋 View Full Terms & Privacy Policy';
+                btn.textContent = '📋 View Complete Terms & Privacy Policy';
             } else {
                 details.classList.add('show');
-                btn.textContent = '📖 Hide Details';
+                btn.textContent = '📖 Hide Policy Details';
             }
         }
 
