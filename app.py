@@ -249,4 +249,6 @@ if __name__ == '__main__':
     # data = load_cleaned_data('cleaned_data.txt')
     # embeddings = load_embeddings('embeddings.npy')
     
-    app.run(debug=True)
+    # Use environment variable for port (for deployment platforms like Render)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
