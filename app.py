@@ -62,26 +62,30 @@ except Exception as e:
 
 # Generate response with OpenAI API
 def generate_response_with_openai(conversation_history, model='diabetes'):
-    openai.api_key = os.getenv('OPENAI_API_KEY')
-    
-    if model == 'preeclampsia':
-        system_prompt = (
-            "You are a helpful assistant specialized in health information, with a focus on preeclampsia and maternal health. "
-            "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
-            "Provide accurate, concise, and informative responses based on the given context. "
-            "If the question is not related to health or preeclampsia, politely inform the user that you can only provide information on health and preeclampsia."
-        )
-    else:  # diabetes
-        system_prompt = (
-            "You are a helpful assistant specialized in health information, with a focus on diabetes and blood sugar management. "
-            "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
-            "Provide accurate, concise, and informative responses based on the given context. "
-            "If the question is not related to health or diabetes, politely inform the user that you can only provide information on health and diabetes."
-        )
-
-    messages = [{"role": "system", "content": system_prompt}] + conversation_history
-
     try:
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            return "Error: OpenAI API key not configured"
+            
+        openai.api_key = api_key
+        
+        if model == 'preeclampsia':
+            system_prompt = (
+                "You are a helpful assistant specialized in health information, with a focus on preeclampsia and maternal health. "
+                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
+                "Provide accurate, concise, and informative responses based on the given context. "
+                "If the question is not related to health or preeclampsia, politely inform the user that you can only provide information on health and preeclampsia."
+            )
+        else:  # diabetes
+            system_prompt = (
+                "You are a helpful assistant specialized in health information, with a focus on diabetes and blood sugar management. "
+                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
+                "Provide accurate, concise, and informative responses based on the given context. "
+                "If the question is not related to health or diabetes, politely inform the user that you can only provide information on health and diabetes."
+            )
+
+        messages = [{"role": "system", "content": system_prompt}] + conversation_history
+
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages,
@@ -89,7 +93,15 @@ def generate_response_with_openai(conversation_history, model='diabetes'):
             temperature=0.7
         )
         return response.choices[0].message.content.strip()
+        
+    except openai.error.AuthenticationError:
+        return "Error: Invalid OpenAI API key. Please check your configuration."
+    except openai.error.RateLimitError:
+        return "Error: OpenAI API rate limit exceeded. Please try again later."
+    except openai.error.APIError as e:
+        return f"Error: OpenAI API error - {str(e)}"
     except Exception as e:
+        print(f"OpenAI error: {str(e)}")
         return f"Sorry, I encountered an error: {str(e)}"
 
 @app.route('/')
@@ -111,51 +123,87 @@ def health_check():
         }
     }), 200
 
+@app.route('/test', methods=['GET', 'POST'])
+def test_endpoint():
+    """Test endpoint to debug issues"""
+    return jsonify({
+        'method': request.method,
+        'endpoint': 'test',
+        'status': 'working',
+        'openai_key_configured': bool(os.getenv('OPENAI_API_KEY')),
+        'data_status': {
+            'diabetes_loaded': len(diabetes_data) > 0,
+            'preeclampsia_loaded': len(preeclampsia_data) > 0
+        }
+    }), 200
+
 @app.route('/chat', methods=['POST'])
 def chat():
-    start_time = time.time()
-    
-    user_message = request.json.get('message', '').strip()
-    model = request.json.get('model', 'diabetes')  
-    
-    if not user_message:
-        return jsonify({'response': 'Please provide a message.', 'conversation_history': conversation_history_dict[model], 'audio_url': None})
+    try:
+        start_time = time.time()
+        
+        # Check if request has JSON data
+        if not request.is_json:
+            return jsonify({'error': 'Request must be JSON', 'response': 'Please send JSON data.'}), 400
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data received', 'response': 'Please provide valid JSON.'}), 400
+            
+        user_message = data.get('message', '').strip()
+        model = data.get('model', 'diabetes')  
+        
+        if not user_message:
+            return jsonify({
+                'response': 'Please provide a message.', 
+                'conversation_history': conversation_history_dict[model], 
+                'audio_url': None
+            })
 
-    # Get relevant context using simple keyword matching
-    if model == 'preeclampsia' and preeclampsia_data:
-        context = retrieve_context_simple(user_message, preeclampsia_data)
-    elif model == 'diabetes' and diabetes_data:
-        context = retrieve_context_simple(user_message, diabetes_data)
-    else:
-        context = []
+        # Get relevant context using simple keyword matching
+        if model == 'preeclampsia' and preeclampsia_data:
+            context = retrieve_context_simple(user_message, preeclampsia_data)
+        elif model == 'diabetes' and diabetes_data:
+            context = retrieve_context_simple(user_message, diabetes_data)
+        else:
+            context = []
 
-    # Add context to the conversation
-    context_text = "\n".join(context[:3]) if context else "No specific context available."
-    
-    # Add user message to conversation history
-    conversation_history_dict[model].append({"role": "user", "content": user_message})
-    
-    # Add context as system message
-    if context:
-        conversation_history_dict[model].append({"role": "system", "content": f"Relevant context: {context_text}"})
+        # Add context to the conversation
+        context_text = "\n".join(context[:3]) if context else "No specific context available."
+        
+        # Add user message to conversation history
+        conversation_history_dict[model].append({"role": "user", "content": user_message})
+        
+        # Add context as system message
+        if context:
+            conversation_history_dict[model].append({"role": "system", "content": f"Relevant context: {context_text}"})
 
-    # Keep conversation history manageable
-    if len(conversation_history_dict[model]) > 10:
-        conversation_history_dict[model] = conversation_history_dict[model][-8:]
+        # Keep conversation history manageable
+        if len(conversation_history_dict[model]) > 10:
+            conversation_history_dict[model] = conversation_history_dict[model][-8:]
 
-    response = generate_response_with_openai(conversation_history_dict[model], model)
-    
-    # Add AI response to conversation history
-    conversation_history_dict[model].append({"role": "assistant", "content": response})
+        response = generate_response_with_openai(conversation_history_dict[model], model)
+        
+        # Add AI response to conversation history
+        conversation_history_dict[model].append({"role": "assistant", "content": response})
 
-    response_time = time.time()
-    print(f"Time to get response: {response_time - start_time} seconds")
+        response_time = time.time()
+        print(f"Time to get response: {response_time - start_time} seconds")
 
-    return jsonify({
-        'response': response, 
-        'conversation_history': conversation_history_dict[model], 
-        'audio_url': None
-    })
+        return jsonify({
+            'response': response, 
+            'conversation_history': conversation_history_dict[model], 
+            'audio_url': None
+        })
+        
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({
+            'error': f'Chat error: {str(e)}',
+            'response': 'Sorry, I encountered an error processing your request.',
+            'conversation_history': conversation_history_dict.get(request.get_json().get('model', 'diabetes') if request.is_json else 'diabetes', []),
+            'audio_url': None
+        }), 500
 
 if __name__ == '__main__':
     # Use environment variable for port (for deployment platforms like Railway)
