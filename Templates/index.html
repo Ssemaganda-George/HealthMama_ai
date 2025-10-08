@@ -264,6 +264,134 @@
             transition: all 0.3s ease;
         }
 
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 2px 8px var(--shadow-medium);
+            transition: all 0.3s ease;
+        }
+
+        /* Hide mobile menu elements on desktop */
+        @media (min-width: 769px) {
+            .mobile-menu-toggle,
+            .mobile-menu-overlay,
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+
+        .mobile-menu-toggle:hover, .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: scale(1.05);
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-panel);
+            z-index: 1600;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 60px 16px 16px 16px;
+        }
+
+        .mobile-menu.show {
+            left: 0;
+        }
+
+        .mobile-menu h2 {
+            font-size: 1.2rem;
+            color: var(--color-primary);
+            margin: 0 0 16px 0;
+            font-weight: 600;
+        }
+
+        .mobile-menu .history-list {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--bg-messages);
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mobile-menu .new-chat-button,
+        .mobile-menu .clear-history-button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .mobile-menu .new-chat-button {
+            background: var(--button-bg);
+            color: white;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .mobile-menu .new-chat-button:hover {
+            background: var(--button-hover);
+            transform: translateY(-1px);
+        }
+
+        .mobile-menu .clear-history-button {
+            background: var(--danger-bg);
+            color: white;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .mobile-menu .clear-history-button:hover {
+            background: var(--danger-hover);
+            transform: translateY(-1px);
+        }
+
         .theme-toggle:hover {
             background: var(--button-hover);
             transform: scale(1.1);
@@ -754,6 +882,15 @@
                 font-size: 0.9rem;
             }
 
+            .mobile-menu-toggle {
+                display: flex;
+                top: 12px;
+                left: 12px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+
             .container {
                 flex-direction: column;
                 height: 100vh;
@@ -761,27 +898,13 @@
             }
 
             .history-panel {
-                width: 100%;
-                height: 180px;
-                min-width: unset;
-                padding: 12px;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .history-panel h2 {
-                font-size: 1.1rem;
-                margin-bottom: 12px;
-            }
-
-            .new-chat-button, .clear-history-button {
-                padding: 10px 14px;
-                font-size: 0.9rem;
+                display: none;
             }
 
             .main-chat {
-                height: calc(100vh - 180px);
-                padding: 16px 12px 12px 12px;
+                width: 100%;
+                height: 100vh;
+                padding: 50px 12px 12px 12px;
             }
 
             .chat-header {
@@ -1023,6 +1146,26 @@
         <i class="fas fa-sun" id="themeIcon"></i>
     </button>
 
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <h2>Chat History</h2>
+        <button class="new-chat-button" onclick="clearChat(true); closeMobileMenu();">
+            <i class="fa-solid fa-plus"></i> New Chat
+        </button>
+        <div class="history-list" id="mobileHistoryList"></div>
+        <button class="clear-history-button" onclick="confirmClearAllHistory(); closeMobileMenu();">
+            <i class="fa-solid fa-trash"></i> Clear All History
+        </button>
+    </div>
+
     <!-- Main Application -->
     <div class="container" id="mainApp" style="opacity: 0.3; pointer-events: none;">
         <div class="history-panel" id="historyPanel">
@@ -1148,6 +1291,65 @@
             } else {
                 icon.className = 'fas fa-sun';
             }
+        }
+
+        // Mobile Menu Management
+        function toggleMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            
+            if (overlay.classList.contains('show')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        }
+
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            
+            overlay.classList.add('show');
+            menu.classList.add('show');
+            
+            // Sync mobile history list with main history list
+            syncMobileHistoryList();
+        }
+
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            
+            overlay.classList.remove('show');
+            menu.classList.remove('show');
+        }
+
+        function syncMobileHistoryList() {
+            const mainHistoryList = document.getElementById('historyList');
+            const mobileHistoryList = document.getElementById('mobileHistoryList');
+            
+            // Clone the main history list content to mobile
+            mobileHistoryList.innerHTML = mainHistoryList.innerHTML;
+            
+            // Update click handlers for mobile menu items to close menu
+            const mobileItems = mobileHistoryList.querySelectorAll('.history-item');
+            mobileItems.forEach(item => {
+                const originalOnClick = item.onclick;
+                item.onclick = function() {
+                    if (originalOnClick) originalOnClick();
+                    closeMobileMenu();
+                };
+            });
+            
+            // Update delete buttons to close menu after action
+            const mobileDeleteButtons = mobileHistoryList.querySelectorAll('.more-options-menu button');
+            mobileDeleteButtons.forEach(btn => {
+                const originalOnClick = btn.onclick;
+                btn.onclick = function(e) {
+                    if (originalOnClick) originalOnClick(e);
+                    closeMobileMenu();
+                };
+            });
         }
 
         // Voice Recording
@@ -1474,6 +1676,9 @@
 
                 historyList.appendChild(item);
             }
+            
+            // Sync mobile history list
+            syncMobileHistoryList();
         }
 
         function toggleMenu(item) {
@@ -1582,6 +1787,13 @@
             document.querySelectorAll('.more-options-menu').forEach(menu => {
                 menu.style.display = 'none';
             });
+        });
+
+        // Close mobile menu with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMobileMenu();
+            }
         });
 
         // Initialize App
