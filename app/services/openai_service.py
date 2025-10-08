@@ -1,6 +1,12 @@
 """
 OpenAI Service for HealthMama AI
 Handles communication with OpenAI API
+
+LANGUAGE HANDLING:
+- Default language: English for all models and contexts
+- Multi-language support: Responds in user's language only when they explicitly use it
+- Luganda detection: Uses strict criteria to avoid false positives
+- Cross-model responses: Default to English unless strong Luganda indicators are present
 """
 import openai
 import logging
@@ -145,9 +151,25 @@ class OpenAIService:
                                      user_message: str, message_lower: str) -> str:
         """Generate response when user asks about wrong topic"""
         
-        # Detect if user is asking in Luganda
-        luganda_indicators = ['nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy']
-        is_luganda = any(indicator in message_lower for indicator in luganda_indicators)
+        # More specific Luganda detection for cross-model responses
+        strong_luganda_indicators = [
+            'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi', 'omukazi', 'omuntu',
+            'nkutegeera', 'nkwagala', 'weebale', 'nkusaba', 'njagala', 'nkwegayirira'
+        ]
+        
+        weak_luganda_indicators = [
+            'nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy'
+        ]
+        
+        # Check for strong Luganda indicators
+        has_strong_luganda = any(indicator in message_lower for indicator in strong_luganda_indicators)
+        
+        # Check for multiple weak indicators (at least 2)
+        weak_count = sum(1 for indicator in weak_luganda_indicators if indicator in message_lower)
+        has_multiple_weak = weak_count >= 2
+        
+        # Only use Luganda if we have strong evidence
+        is_luganda = has_strong_luganda or has_multiple_weak
         
         if current_model == 'diabetes' and suggested_model == 'preeclampsia':
             if is_luganda:
@@ -223,8 +245,10 @@ class OpenAIService:
                 "IMPORTANT: You are NOT specialized in diabetes. If users ask about diabetes, blood sugar, "
                 "or insulin-related questions, provide only basic information and clearly direct them to "
                 "switch to the Gestational Diabetes Model.\n\n"
-                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
-                "If the user asks in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
+                "LANGUAGE INSTRUCTIONS: Always respond in English by default, as this is your primary language. "
+                "Only respond in another language (like Luganda) if the user explicitly asks their question in that language "
+                "and it's clear they prefer that language. If a user asks in English, always respond in English. "
+                "When responding in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
                 "Include practical advice that is relevant to Ugandan healthcare context. "
                 "Use common Luganda health terms and explain medical concepts in ways that are easily understood. "
                 "Provide accurate, concise, and informative responses based on your specialized knowledge of preeclampsia."
@@ -237,8 +261,10 @@ class OpenAIService:
                 "IMPORTANT: You are NOT specialized in preeclampsia. If users ask about preeclampsia, "
                 "high blood pressure during pregnancy, or maternal complications unrelated to diabetes, "
                 "provide only basic information and clearly direct them to switch to the Pre-eclampsia Model.\n\n"
-                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
-                "If the user asks in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
+                "LANGUAGE INSTRUCTIONS: Always respond in English by default, as this is your primary language. "
+                "Only respond in another language (like Luganda) if the user explicitly asks their question in that language "
+                "and it's clear they prefer that language. If a user asks in English, always respond in English. "
+                "When responding in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
                 "Include practical advice about diet, exercise, and diabetes management that is relevant to Ugandan lifestyle and available foods. "
                 "Use common Luganda health terms and explain medical concepts in ways that are easily understood. "
                 "Mention local foods like matooke, posho, beans, and their effects on blood sugar when relevant. "
@@ -247,19 +273,43 @@ class OpenAIService:
     
     def _detect_luganda_and_add_instruction(self, user_message: str, conversation_history: List[Dict], model: str) -> List[Dict]:
         """Detect Luganda language and add specific instructions for better responses"""
-        luganda_indicators = [
-            'nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy', 
-            'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi'
+        # More specific Luganda detection - require multiple indicators or clear Luganda words
+        strong_luganda_indicators = [
+            'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi', 'omukazi', 'omuntu',
+            'nkutegeera', 'nkwagala', 'weebale', 'nkusaba', 'njagala', 'nkwegayirira'
         ]
         
-        if any(indicator in user_message.lower() for indicator in luganda_indicators):
+        weak_luganda_indicators = [
+            'nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy'
+        ]
+        
+        message_lower = user_message.lower()
+        
+        # Check for strong indicators (clear Luganda words)
+        has_strong_luganda = any(indicator in message_lower for indicator in strong_luganda_indicators)
+        
+        # Check for multiple weak indicators (at least 2)
+        weak_count = sum(1 for indicator in weak_luganda_indicators if indicator in message_lower)
+        has_multiple_weak = weak_count >= 2
+        
+        # Only add Luganda instructions if we have strong evidence
+        if has_strong_luganda or has_multiple_weak:
             conversation_history.append({
                 "role": "system", 
                 "content": (
-                    "The user is asking in Luganda. Please respond in clear, detailed Luganda using simple terms. "
+                    "The user is clearly asking in Luganda. Please respond in clear, detailed Luganda using simple terms. "
                     "Include practical advice relevant to Ugandan context. Use common Luganda health vocabulary "
                     "and explain medical terms clearly. Give specific examples with local foods like matooke, "
                     "posho, beans when discussing diet."
+                )
+            })
+        else:
+            # Default instruction to ensure English responses
+            conversation_history.append({
+                "role": "system", 
+                "content": (
+                    "The user is asking in English. Please respond in clear, professional English. "
+                    "Provide detailed, medically accurate information while keeping it accessible and easy to understand."
                 )
             })
         
