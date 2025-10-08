@@ -1715,8 +1715,22 @@
                 if (data.response) {
                     // Add user message placeholder for voice
                     addMessage('🎤 Voice message sent', 'user');
+                    
+                    // Check if response suggests switching models
+                    const suggestsModelSwitch = data.response.includes('switch to the') || 
+                                              data.response.includes('kyuusakyuuse ku') ||
+                                              data.response.includes('specialized in');
+                    
                     setTimeout(() => {
                         addMessage(data.response, 'assistant');
+                        
+                        // Show model switch notification if detected
+                        if (suggestsModelSwitch) {
+                            const suggestedModel = selectedModel === 'diabetes' ? 'Pre-eclampsia' : 'Gestational Diabetes';
+                            setTimeout(() => {
+                                showModelSwitchNotification(suggestedModel);
+                            }, 1000);
+                        }
                     }, 500);
                     
                     // Play audio response if available
@@ -1812,9 +1826,24 @@
                 document.getElementById('sendButton').disabled = false;
                 
                 if (data.response) {
+                    // Check if response suggests switching models
+                    const suggestsModelSwitch = data.response.includes('switch to the') || 
+                                              data.response.includes('kyuusakyuuse ku') ||
+                                              data.response.includes('specialized in');
+                    
                     // Simulate typing delay for better UX
                     setTimeout(() => {
                         addMessage(data.response, 'assistant');
+                        
+                        // Show model switch notification if detected
+                        if (suggestsModelSwitch) {
+                            const currentModel = selectedModel === 'diabetes' ? 'Gestational Diabetes' : 'Pre-eclampsia';
+                            const suggestedModel = selectedModel === 'diabetes' ? 'Pre-eclampsia' : 'Gestational Diabetes';
+                            
+                            setTimeout(() => {
+                                showModelSwitchNotification(suggestedModel);
+                            }, 1000);
+                        }
                     }, 500);
                     
                     // Play audio response if available
@@ -2038,6 +2067,99 @@
                     document.body.removeChild(notification);
                 }, 300);
             }, 3000);
+        }
+
+        // Model Switch Notification
+        function showModelSwitchNotification(suggestedModel) {
+            const notification = document.createElement('div');
+            notification.className = 'model-switch-notification';
+            
+            const isPreeclampsia = suggestedModel.includes('Pre-eclampsia');
+            const bgColor = isPreeclampsia ? 'var(--medical-teal)' : 'var(--medical-navy)';
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-exchange-alt" style="font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">
+                            Switch to ${suggestedModel} Model?
+                        </div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">
+                            Get specialized help for your question
+                        </div>
+                    </div>
+                    <button onclick="switchToSuggestedModel('${isPreeclampsia ? 'preeclampsia' : 'diabetes'}')" 
+                            style="
+                                background: rgba(255,255,255,0.2); 
+                                border: 1px solid rgba(255,255,255,0.3);
+                                color: white; 
+                                padding: 0.5rem 1rem; 
+                                border-radius: var(--border-radius-small);
+                                cursor: pointer;
+                                font-weight: bold;
+                                transition: var(--transition);
+                            " 
+                            onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        Switch Now
+                    </button>
+                </div>
+            `;
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                padding: 1.5rem;
+                background: ${bgColor};
+                color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-hover);
+                z-index: 10000;
+                max-width: 400px;
+                transform: translateX(450px);
+                transition: var(--transition);
+                border: 2px solid rgba(255,255,255,0.1);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto-hide after 8 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(450px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 8000);
+        }
+
+        // Switch to suggested model
+        function switchToSuggestedModel(modelId) {
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.value = modelId;
+            changeModel();
+            
+            // Remove any existing notifications
+            const notifications = document.querySelectorAll('.model-switch-notification');
+            notifications.forEach(notif => {
+                notif.style.transform = 'translateX(450px)';
+                setTimeout(() => {
+                    if (document.body.contains(notif)) {
+                        document.body.removeChild(notif);
+                    }
+                }, 300);
+            });
+            
+            // Show success notification
+            const modelName = modelId === 'preeclampsia' ? 'Pre-eclampsia' : 'Gestational Diabetes';
+            showNotification(`Switched to ${modelName} Model! 🎯`, 'success');
         }
     </script>
 </body>

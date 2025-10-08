@@ -55,6 +55,14 @@ class OpenAIService:
     def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None) -> str:
         """Generate response using OpenAI API"""
         try:
+            # Check for cross-model queries first
+            cross_model_response = self._check_cross_model_query(user_message, model)
+            if cross_model_response:
+                # Add both user message and assistant response to conversation
+                self.conversation_manager.add_message(model, "user", user_message)
+                self.conversation_manager.add_message(model, "assistant", cross_model_response)
+                return cross_model_response
+            
             # Add user message to conversation
             self.conversation_manager.add_message(model, "user", user_message)
             
@@ -99,28 +107,142 @@ class OpenAIService:
             self.logger.error(f"OpenAI error: {str(e)}")
             return f"Sorry, I encountered an error: {str(e)}"
     
+    def _check_cross_model_query(self, user_message: str, current_model: str) -> Optional[str]:
+        """Check if user is asking about the wrong topic for current model"""
+        message_lower = user_message.lower()
+        
+        # Define keywords for each condition
+        diabetes_keywords = [
+            'diabetes', 'diabetic', 'blood sugar', 'glucose', 'insulin', 'glycemic', 
+            'hyperglycemia', 'hypoglycemia', 'gestational diabetes', 'blood glucose',
+            'sugar level', 'a1c', 'hemoglobin a1c', 'metformin', 'ssukali', 'sukali'
+        ]
+        
+        preeclampsia_keywords = [
+            'preeclampsia', 'pre-eclampsia', 'eclampsia', 'high blood pressure', 
+            'hypertension', 'protein in urine', 'proteinuria', 'swelling', 'edema',
+            'seizures', 'headaches', 'vision changes', 'blood pressure', 'bp',
+            'pregnancy complications', 'maternal health', 'pregnancy hypertension'
+        ]
+        
+        # Check if diabetes model is being asked about preeclampsia
+        if current_model == 'diabetes':
+            if any(keyword in message_lower for keyword in preeclampsia_keywords):
+                return self._generate_cross_model_response(
+                    'diabetes', 'preeclampsia', user_message, message_lower
+                )
+        
+        # Check if preeclampsia model is being asked about diabetes
+        elif current_model == 'preeclampsia':
+            if any(keyword in message_lower for keyword in diabetes_keywords):
+                return self._generate_cross_model_response(
+                    'preeclampsia', 'diabetes', user_message, message_lower
+                )
+        
+        return None
+    
+    def _generate_cross_model_response(self, current_model: str, suggested_model: str, 
+                                     user_message: str, message_lower: str) -> str:
+        """Generate response when user asks about wrong topic"""
+        
+        # Detect if user is asking in Luganda
+        luganda_indicators = ['nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy']
+        is_luganda = any(indicator in message_lower for indicator in luganda_indicators)
+        
+        if current_model == 'diabetes' and suggested_model == 'preeclampsia':
+            if is_luganda:
+                return (
+                    "Nkutegeera nti obuuza ku preeclampsia. Kino kiragiro kya maanyi nnyo ku bakazi abali mu lubuto. "
+                    "Preeclampsia kitegeeza omusujja gw'omusaayi ogweyongera n'amafuta mu nsigo.\n\n"
+                    "**Obubonero bwa Preeclampsia:**\n"
+                    "• Omusujja gw'omusaayi ogweyongera (okusukka 140/90)\n"
+                    "• Amafuta mu nsigo\n"
+                    "• Okuzimba mu mikono, amagulu, n'amaaso\n"
+                    "• Omutwe okukuba ennyo\n"
+                    "• Okulaba obutali bulungi\n\n"
+                    "**Kyokka,** nze ndi mubunyangaanya bw'obuwuka bwa ssukali (diabetes). "
+                    "Okufuna obuyambi obujjuvu ku preeclampsia, **kyuusakyuuse ku Pre-eclampsia Model** "
+                    "mu menu waggulu. Eyo gye munaafunira obuyambi obwetongole ku preeclampsia n'obulamu bw'omukazi ali mu lubuto."
+                )
+            else:
+                return (
+                    "I understand you're asking about preeclampsia. This is a serious pregnancy condition "
+                    "characterized by high blood pressure and protein in the urine.\n\n"
+                    "**Key signs of Preeclampsia:**\n"
+                    "• High blood pressure (above 140/90)\n"
+                    "• Protein in urine\n"
+                    "• Swelling in hands, feet, and face\n"
+                    "• Severe headaches\n"
+                    "• Vision changes\n\n"
+                    "**However,** I'm specialized in diabetes and blood sugar management. "
+                    "For comprehensive help with preeclampsia, please **switch to the Pre-eclampsia Model** "
+                    "using the dropdown menu above. That model is specifically designed to provide "
+                    "detailed guidance on preeclampsia and maternal health complications."
+                )
+        
+        elif current_model == 'preeclampsia' and suggested_model == 'diabetes':
+            if is_luganda:
+                return (
+                    "Nkutegeera nti obuuza ku diabetes/ssukali. Kino kiragiro kya ssukali mu musaayi "
+                    "okweyongera ennyo, era kyandibadde kya maanyi nnyo mu bakazi abali mu lubuto.\n\n"
+                    "**Obubonero bwa Diabetes mu lubuto:**\n"
+                    "• Ssukali mu musaayi okweyongera\n"
+                    "• Okunywa amazzi mangi\n"
+                    "• Okukojjagana ennyo\n"
+                    "• Okucwa obuzito mu bwangu\n"
+                    "• Okweraliikirira mu bwangu\n\n"
+                    "**Kyokka,** nze ndi mubunyangaanya bw'obuwuka bwa preeclampsia n'obulamu bw'omukazi. "
+                    "Okufuna obuyambi obujjuvu ku diabetes, **kyuusakyuuse ku Gestational Diabetes Model** "
+                    "mu menu waggulu. Eyo gye munaafunira obuyambi obwetongole ku ssukali n'emmere gy'olya."
+                )
+            else:
+                return (
+                    "I understand you're asking about diabetes. This is a condition where blood sugar levels "
+                    "become too high, and it can be particularly important during pregnancy.\n\n"
+                    "**Key signs of Diabetes:**\n"
+                    "• High blood sugar levels\n"
+                    "• Increased thirst\n"
+                    "• Frequent urination\n"
+                    "• Unexplained weight loss\n"
+                    "• Increased fatigue\n\n"
+                    "**However,** I'm specialized in preeclampsia and maternal health complications. "
+                    "For comprehensive help with diabetes, please **switch to the Gestational Diabetes Model** "
+                    "using the dropdown menu above. That model is specifically designed to provide "
+                    "detailed guidance on blood sugar management, diet, and diabetes care."
+                )
+        
+        return ""
+    
     def _get_system_prompt(self, model: str) -> str:
         """Get system prompt for the model"""
         if model == 'preeclampsia':
             return (
-                "You are a helpful assistant specialized in health information, with a focus on preeclampsia and maternal health. "
+                "You are a helpful assistant specialized in preeclampsia and maternal health complications. "
+                "Your primary expertise is in preeclampsia, high blood pressure during pregnancy, maternal health, "
+                "pregnancy complications, and related conditions.\n\n"
+                "IMPORTANT: You are NOT specialized in diabetes. If users ask about diabetes, blood sugar, "
+                "or insulin-related questions, provide only basic information and clearly direct them to "
+                "switch to the Gestational Diabetes Model.\n\n"
                 "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
                 "If the user asks in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
                 "Include practical advice that is relevant to Ugandan healthcare context. "
                 "Use common Luganda health terms and explain medical concepts in ways that are easily understood. "
-                "Provide accurate, concise, and informative responses based on the given context. "
-                "If the question is not related to health or preeclampsia, politely inform the user that you can only provide information on health and preeclampsia."
+                "Provide accurate, concise, and informative responses based on your specialized knowledge of preeclampsia."
             )
         else:  # diabetes
             return (
-                "You are a helpful assistant specialized in health information, with a focus on diabetes and blood sugar management. "
+                "You are a helpful assistant specialized in diabetes, gestational diabetes, and blood sugar management. "
+                "Your primary expertise is in diabetes care, blood glucose monitoring, diet management, "
+                "insulin therapy, and diabetes-related complications.\n\n"
+                "IMPORTANT: You are NOT specialized in preeclampsia. If users ask about preeclampsia, "
+                "high blood pressure during pregnancy, or maternal complications unrelated to diabetes, "
+                "provide only basic information and clearly direct them to switch to the Pre-eclampsia Model.\n\n"
                 "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
                 "If the user asks in Luganda, provide detailed, culturally appropriate responses using simple, clear Luganda. "
                 "Include practical advice about diet, exercise, and diabetes management that is relevant to Ugandan lifestyle and available foods. "
                 "Use common Luganda health terms and explain medical concepts in ways that are easily understood. "
                 "Mention local foods like matooke, posho, beans, and their effects on blood sugar when relevant. "
-                "Provide accurate, concise, and informative responses based on the given context. "
-                "If the question is not related to health or diabetes, politely inform the user that you can only provide information on health and diabetes."
+                "Provide accurate, concise, and informative responses based on your specialized knowledge of diabetes."
             )
     
     def _detect_luganda_and_add_instruction(self, user_message: str, conversation_history: List[Dict], model: str) -> List[Dict]:
