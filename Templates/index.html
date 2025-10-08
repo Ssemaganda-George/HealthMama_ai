@@ -3,1807 +3,1891 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthMamaAi ChatBot</title>
-    <meta name="description" content="HealthMama Ai: Your AI-powered diabetes and health chatbot assistant.">
-    <link rel="icon" href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f468-200d-2695-fe0f.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>HealthMama AI - Your Trusted Health Companion</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* CSS Variables for Light/Dark Mode */
         :root {
-            --bg-primary: linear-gradient(135deg, #e3f2fd 0%, #b2ebf2 100%);
-            --bg-secondary: rgba(255,255,255,0.99);
-            --bg-panel: #e3f2fd;
-            --bg-messages: #fff;
-            --bg-input: #e3f2fd;
-            --color-primary: #1976d2;
-            --color-secondary: #80deea;
-            --color-text: #333;
-            --color-text-light: #666;
-            --border-color: #b3e5fc;
-            --shadow-light: rgba(33,150,243,0.06);
-            --shadow-medium: rgba(33,150,243,0.13);
-            --button-bg: linear-gradient(135deg, #1976d2 60%, #80deea 100%);
-            --button-hover: linear-gradient(135deg, #00838f 60%, #1976d2 100%);
-            --danger-bg: linear-gradient(135deg, #e57373 60%, #f44336 100%);
-            --danger-hover: linear-gradient(135deg, #b71c1c 60%, #e57373 100%);
-            --voice-bg: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-            --voice-hover: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --background-color: #ffffff;
+            --surface-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 16px;
+            --border-radius-small: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
         [data-theme="dark"] {
-            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            --bg-secondary: rgba(30,30,30,0.95);
-            --bg-panel: #2d2d2d;
-            --bg-messages: #3a3a3a;
-            --bg-input: #2d2d2d;
-            --color-primary: #64b5f6;
-            --color-secondary: #4fc3f7;
-            --color-text: #e0e0e0;
-            --color-text-light: #b0b0b0;
-            --border-color: #555;
-            --shadow-light: rgba(0,0,0,0.3);
-            --shadow-medium: rgba(0,0,0,0.4);
-            --button-bg: linear-gradient(135deg, #1976d2 60%, #42a5f5 100%);
-            --button-hover: linear-gradient(135deg, #1565c0 60%, #1976d2 100%);
-            --danger-bg: linear-gradient(135deg, #f44336 60%, #d32f2f 100%);
-            --danger-hover: linear-gradient(135deg, #b71c1c 60%, #f44336 100%);
-            --voice-bg: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
-            --voice-hover: linear-gradient(135deg, #8e24aa 60%, #ab47bc 100%);
+            --background-color: #1a1a1a;
+            --surface-color: #2d2d2d;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
         }
 
-        /* Preeclampsia Theme Variables */
-        .preeclampsia-theme {
-            --bg-primary: linear-gradient(135deg, #f3e5f5 0%, #ce93d8 100%);
-            --bg-panel: #f3e5f5;
-            --color-primary: #8e24aa;
-            --border-color: #ce93d8;
-            --button-bg: linear-gradient(135deg, #8e24aa 60%, #ce93d8 100%);
-            --button-hover: linear-gradient(135deg, #ab47bc 60%, #8e24aa 100%);
-            --danger-bg: linear-gradient(135deg, #f06292 60%, #bdbdbd 100%);
-            --danger-hover: linear-gradient(135deg, #bdbdbd 60%, #f06292 100%);
-        }
-
-        [data-theme="dark"].preeclampsia-theme {
-            --bg-primary: linear-gradient(135deg, #2d1b3d 0%, #4a2c6a 100%);
-            --bg-panel: #3d2c52;
-            --color-primary: #ce93d8;
-            --border-color: #6a4c80;
-            --button-bg: linear-gradient(135deg, #8e24aa 60%, #ab47bc 100%);
-            --button-hover: linear-gradient(135deg, #7b1fa2 60%, #8e24aa 100%);
-        }
-
-        /* Base Styles */
-        html, body {
-            height: 100%;
-            width: 100%;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            background: var(--bg-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--color-text);
-            transition: all 0.3s ease;
-            overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: var(--transition);
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Privacy Policy Modal */
-        .privacy-modal {
-            position: fixed;
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        /* Single Page Layout Optimization */
+        #mainApp {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #mainApp main {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem 1rem;
+            position: sticky;
             top: 0;
-            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .logo.float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .logo img {
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
-        .privacy-modal.show {
+        .brand-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .brand-text p {
+            font-size: 0.8rem;
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Main Container */
+        main {
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.95);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+            opacity: 0.9;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: relative;
+            display: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .mobile-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            min-width: 200px;
+            z-index: 1001;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .mobile-menu-dropdown.active {
+            transform: translateY(0);
             opacity: 1;
             visibility: visible;
         }
 
-        .privacy-content {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: min(90vw, 600px);
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            text-align: center;
+        .mobile-menu-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            color: var(--text-color);
+            transition: var(--transition);
         }
 
-        .privacy-content h2 {
-            color: var(--color-primary);
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
+        .mobile-menu-item:hover {
+            background: var(--border-color);
         }
 
-        .privacy-summary {
-            color: var(--color-text);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
+        .mobile-menu-item:last-child {
+            border-bottom: none;
         }
 
-        .privacy-details {
-            display: none;
-            text-align: left;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .privacy-details.show {
-            display: block;
-        }
-
-        .privacy-details h3 {
-            color: var(--color-primary);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .privacy-details ul {
-            margin: 0.5rem 0 1rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .privacy-details li {
-            margin-bottom: 0.4rem;
-            line-height: 1.5;
-            color: var(--color-text);
-        }
-
-        .privacy-content p {
-            line-height: 1.6;
-            margin-bottom: 1rem;
-            color: var(--color-text);
-            font-size: 0.95rem;
-        }
-
-        .privacy-content ul {
-            margin: 1rem 0;
-            padding-left: 2rem;
-        }
-
-        .privacy-content li {
-            margin-bottom: 0.5rem;
-            color: var(--color-text);
-        }
-
-        .privacy-buttons {
+        /* Desktop Controls */
+        .desktop-controls {
             display: flex;
             gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .privacy-accept, .privacy-decline, .view-details-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1rem;
-            min-width: 120px;
-        }
-
-        .privacy-accept {
-            background: var(--button-bg);
-            color: white;
-        }
-
-        .privacy-accept:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-        }
-
-        .privacy-decline {
-            background: var(--danger-bg);
-            color: white;
-        }
-
-        .privacy-decline:hover {
-            background: var(--danger-hover);
-            transform: translateY(-2px);
-        }
-
-        .view-details-btn {
-            background: transparent;
-            color: var(--color-primary);
-            border: 2px solid var(--color-primary);
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            min-width: auto;
-        }
-
-        .view-details-btn:hover {
-            background: var(--color-primary);
-            color: white;
-            transform: translateY(-1px);
+            align-items: center;
         }
 
         /* Dark Mode Toggle */
         .theme-toggle {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: var(--button-bg);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 8px var(--shadow-medium);
-            transition: all 0.3s ease;
-        }
-
-        /* Mobile Menu Toggle */
-        .mobile-menu-toggle {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background: var(--button-bg);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 1001;
-            box-shadow: 0 2px 8px var(--shadow-medium);
-            transition: all 0.3s ease;
-        }
-
-        /* Hide mobile menu elements on desktop */
-        @media (min-width: 769px) {
-            .mobile-menu-toggle,
-            .mobile-menu-overlay,
-            .mobile-menu {
-                display: none !important;
-            }
-        }
-
-        .mobile-menu-toggle:hover, .theme-toggle:hover {
-            background: var(--button-hover);
-            transform: scale(1.05);
-        }
-
-        /* Mobile Menu Overlay */
-        .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1500;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .mobile-menu-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: var(--bg-panel);
-            z-index: 1600;
-            transition: all 0.3s ease;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 60px 16px 16px 16px;
-        }
-
-        .mobile-menu.show {
-            left: 0;
-        }
-
-        .mobile-menu h2 {
-            font-size: 1.2rem;
-            color: var(--color-primary);
-            margin: 0 0 16px 0;
-            font-weight: 600;
-        }
-
-        .mobile-menu .history-list {
-            flex: 1;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background-color: var(--bg-messages);
-            padding: 8px;
-            margin-bottom: 16px;
-        }
-
-        .mobile-menu .new-chat-button,
-        .mobile-menu .clear-history-button {
-            border: none;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .mobile-menu .new-chat-button {
-            background: var(--button-bg);
-            color: white;
-            box-shadow: 0 2px 8px var(--shadow-light);
-        }
-
-        .mobile-menu .new-chat-button:hover {
-            background: var(--button-hover);
-            transform: translateY(-1px);
-        }
-
-        .mobile-menu .clear-history-button {
-            background: var(--danger-bg);
-            color: white;
-            box-shadow: 0 2px 8px var(--shadow-light);
-        }
-
-        .mobile-menu .clear-history-button:hover {
-            background: var(--danger-hover);
-            transform: translateY(-1px);
+            gap: 0.5rem;
         }
 
         .theme-toggle:hover {
-            background: var(--button-hover);
-            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
         }
 
-        /* Container and Layout */
-        .container {
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
             display: flex;
-            flex-direction: row;
-            width: 100vw;
-            height: 100vh;
-            background: var(--bg-secondary);
-            box-shadow: 0 8px 32px var(--shadow-medium);
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
             overflow: hidden;
         }
 
-        .history-panel {
-            width: 300px;
-            min-width: 280px;
-            background-color: var(--bg-panel);
-            border-right: 1px solid var(--border-color);
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-danger {
+            background: var(--gradient-secondary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: calc(100vh - 120px);
             display: flex;
             flex-direction: column;
-            padding: 16px;
-            transition: all 0.3s ease;
         }
 
-        .history-panel h2 {
-            font-size: 1.2rem;
-            color: var(--color-primary);
-            margin: 0 0 16px 0;
-            font-weight: 600;
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 0.75rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.9);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .history-list {
-            flex: 1;
-            overflow-y: auto;
+        .welcome-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .welcome-section p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 1rem;
+            line-height: 1.5;
+        }
+
+        /* Professional 3-Dots Menu */
+        .menu-container {
+            position: relative;
+        }
+
+        .menu-toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+        }
+
+        .menu-toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-hover);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background-color: var(--bg-messages);
-            padding: 8px;
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            margin-top: 0.5rem;
         }
 
-        .history-item {
-            padding: 12px;
+        .menu-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
+            color: var(--text-color);
+            transition: var(--transition);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            position: relative;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            transition: all 0.2s ease;
-            color: var(--color-text);
+            gap: 0.75rem;
+            font-size: 0.9rem;
         }
 
-        .history-item:hover {
-            background-color: var(--bg-panel);
-            transform: translateX(4px);
+        .menu-item:hover {
+            background: var(--primary-color);
+            color: white;
         }
 
-        .history-item:last-child {
+        .menu-item:last-child {
             border-bottom: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
         }
 
-        .more-options {
-            cursor: pointer;
-            font-size: 1.2rem;
-            color: var(--color-text-light);
-            transition: color 0.2s ease;
+        .menu-item:first-child {
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
 
-        .more-options:hover {
-            color: var(--color-primary);
+        .menu-item i {
+            width: 16px;
+            text-align: center;
         }
 
-        .more-options-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 40px;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px var(--shadow-light);
-            z-index: 1000;
-            min-width: 120px;
-        }
-
-        .more-options-menu button {
-            display: block;
-            width: 100%;
-            padding: 10px 16px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            text-align: left;
-            color: var(--color-text);
-            transition: background-color 0.2s ease;
-        }
-
-        .more-options-menu button:hover {
-            background-color: var(--bg-panel);
-        }
-
-        /* Action Buttons */
-        .new-chat-button, .clear-history-button {
-            border: none;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.97rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .new-chat-button {
-            background: var(--button-bg);
-            color: white;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px var(--shadow-light);
-        }
-
-        .new-chat-button:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        .clear-history-button {
-            background: var(--danger-bg);
-            color: white;
-            margin-top: 10px;
-            box-shadow: 0 2px 8px var(--shadow-light);
-        }
-
-        .clear-history-button:hover {
-            background: var(--danger-hover);
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        /* Main Chat Area */
-        .main-chat {
+        /* Chat Interface */
+        .chat-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--shadow);
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 32px 24px 20px 24px;
-            background: transparent;
+            height: calc(100vh - 240px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .chat-logo {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 2px 8px var(--shadow-medium);
-            object-fit: cover;
-        }
-
-        h1 {
-            color: var(--color-primary);
-            font-size: 1.7rem;
-            margin: 0;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        #modelSelect {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1.5px solid var(--border-color);
-            font-size: 1rem;
-            background: var(--bg-input);
-            color: var(--color-primary);
-            font-weight: 600;
-            outline: none;
-            box-shadow: 0 1px 4px var(--shadow-light);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        #modelSelect:focus {
-            border-color: var(--color-primary);
-        }
-
-        /* Messages Area */
-        .messages {
+        .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 18px 10px 10px 10px;
-            margin-bottom: 10px;
-            background: var(--bg-messages);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px var(--shadow-light);
-            position: relative;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            min-height: 200px;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .message {
-            display: flex;
-            align-items: flex-end;
-            margin-bottom: 16px;
-            animation: fadeInUp 0.5s ease-out;
+            margin-bottom: 1rem;
+            padding: 0.9rem 1.2rem;
+            border-radius: var(--border-radius);
+            max-width: 85%;
+            animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 2px;
         }
 
         .message.user {
-            flex-direction: row-reverse;
-        }
-
-        .message.bot {
-            flex-direction: row;
-        }
-
-        .message .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--button-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            background: var(--gradient-primary);
             color: white;
-            margin: 0 8px;
-            box-shadow: 0 2px 8px var(--shadow-light);
-            border: 2px solid var(--bg-messages);
-            flex-shrink: 0;
+            margin-left: auto;
+            box-shadow: var(--shadow);
         }
 
-        .message .content {
-            max-width: 75%;
-            padding: 14px 18px;
-            border-radius: 16px;
-            font-size: 1rem;
-            line-height: 1.5;
-            box-shadow: 0 2px 8px var(--shadow-light);
-            word-break: break-word;
-            position: relative;
+        .message.user::before {
+            background: rgba(255,255,255,0.3);
         }
 
-        .message.user .content {
-            background: var(--button-bg);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.bot .content {
-            background: var(--bg-secondary);
-            color: var(--color-text);
+        .message.assistant {
+            background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .message.assistant::before {
+            background: var(--secondary-color);
         }
 
-        /* Input Area */
-        .input-container {
+        .message i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .chat-input-section {
             display: flex;
-            align-items: stretch;
-            margin-top: 12px;
-            gap: 8px;
+            gap: 1rem;
+            align-items: flex-end;
+            position: relative;
         }
 
         .input-wrapper {
-            position: relative;
             flex: 1;
+            position: relative;
             display: flex;
-            align-items: center;
-        }
-
-        .image-upload-label {
-            position: absolute;
-            left: 12px;
-            z-index: 2;
-            cursor: pointer;
-            color: var(--color-text-light);
-            font-size: 1.2rem;
-            transition: color 0.2s ease;
-        }
-
-        .image-upload-label:hover {
-            color: var(--color-primary);
-        }
-
-        #image-upload {
-            display: none;
-        }
-
-        #query {
-            width: 100%;
-            padding: 14px 16px 14px 40px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 1rem;
-            background: var(--bg-input);
-            color: var(--color-text);
-            outline: none;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-
-        #query:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-        }
-
-        #query::placeholder {
-            color: var(--color-text-light);
-        }
-
-        #image-preview {
-            max-width: 38px;
-            max-height: 38px;
-            border-radius: 6px;
+            align-items: flex-end;
+            background: var(--background-color);
             border: 1px solid var(--border-color);
-            vertical-align: middle;
-            display: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            transition: var(--transition);
         }
 
-        .action-button {
+        .input-wrapper:focus-within {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+            margin-left: 0.5rem;
+        }
+
+        .input-btn {
+            width: 36px;
+            height: 36px;
             border: none;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .input-btn:hover {
+            background: var(--secondary-color);
             color: white;
-            box-shadow: 0 2px 8px var(--shadow-light);
-        }
-
-        .send-button {
-            background: var(--button-bg);
-        }
-
-        .send-button:hover {
-            background: var(--button-hover);
-            transform: scale(1.05);
-        }
-
-        .voice-record-button {
-            background: var(--voice-bg);
-        }
-
-        .voice-record-button:hover {
-            background: var(--voice-hover);
-            transform: scale(1.05);
-        }
-
-        .voice-record-button.recording {
-            background: #ff5722;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* Scroll Button */
-        #scrollLatest {
-            position: absolute;
-            right: 24px;
-            bottom: 90px;
-            z-index: 100;
-            background: var(--button-bg);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            box-shadow: 0 4px 12px var(--shadow-medium);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: none;
-            transition: all 0.2s ease;
-        }
-
-        #scrollLatest:hover {
-            background: var(--button-hover);
             transform: scale(1.1);
         }
 
-        /* Typing Indicator */
-        .typing-indicator {
-            display: none;
-            text-align: center;
-            margin: 10px 0;
+        .input-btn.recording {
+            background: var(--accent-color);
+            color: white;
+            animation: pulse 1s infinite;
         }
 
-        .typing-indicator .dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--color-primary);
-            border-radius: 50%;
-            display: inline-block;
-            animation: typing 1.4s infinite ease-in-out;
-            margin: 0 2px;
-        }
-
-        .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% {
-                transform: scale(0);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Caution Message */
-        .caution-message {
-            margin: 12px auto 0;
-            max-width: 480px;
-            color: #b26a00;
-            background: var(--bg-input);
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: var(--border-radius);
+            margin: 0.5rem 0;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            text-align: center;
-            box-shadow: 0 1px 4px var(--shadow-light);
+            position: relative;
         }
 
-        /* Edit Functionality */
-        .edit-btn, .save-btn {
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recording-indicator {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-left: 0.5rem;
+            animation: pulse 1s infinite;
+        }
+
+        /* Model Selection */
+        .model-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .model-select {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-small);
+            background: var(--surface-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+            box-shadow: var(--shadow);
+            min-width: 200px;
+        }
+
+        .model-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .model-select:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Theme variations for different models */
+        .diabetes-theme {
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #1976d2;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        .preeclampsia-theme {
+            --gradient-primary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --primary-color: #8e24aa;
+            --secondary-color: #ab47bc;
+            --accent-color: #f06292;
+        }
+
+        .diabetes-theme .message.assistant::before {
+            background: #1976d2;
+        }
+
+        .preeclampsia-theme .message.assistant::before {
+            background: #8e24aa;
+        }
+
+        .model-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .model-indicator:hover {
+            transform: scale(1.05);
+        }
+
+        .diabetes-theme .model-indicator {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
+            color: #1976d2;
+            border: 2px solid rgba(25, 118, 210, 0.2);
+        }
+
+        .preeclampsia-theme .model-indicator {
+            background: linear-gradient(135deg, rgba(142, 36, 170, 0.1) 0%, rgba(171, 71, 188, 0.1) 100%);
+            color: #8e24aa;
+            border: 2px solid rgba(142, 36, 170, 0.2);
+        }
+
+        /* Security notice */
+        .security-notice {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius-small);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+            box-shadow: var(--shadow);
+            border-left: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .security-notice.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        /* Animations */
+        @keyframes messageSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 1000px; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--background-color);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .close {
             background: none;
             border: none;
-            color: var(--color-text-light);
-            margin-left: 8px;
+            color: white;
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 1rem;
-            transition: color 0.2s ease;
-            padding: 4px;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
         }
 
-        .edit-btn:hover, .save-btn:hover {
-            color: var(--color-primary);
+        .close:hover {
+            background: rgba(255,255,255,0.1);
         }
 
-        .edit-input {
-            font-size: 1rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-input);
-            color: var(--color-text);
-            width: 100%;
-            font-family: inherit;
+        .modal-body {
+            padding: 1.5rem;
         }
 
-        /* Mobile Responsive Design */
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        /* Privacy Policy Styles */
+        .privacy-summary {
+            background: var(--surface-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .privacy-details {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .privacy-details.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .privacy-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .privacy-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .view-details-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 1000px; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .theme-toggle {
-                top: 12px;
-                right: 12px;
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
+            .header {
+                padding: 0.5rem 0;
             }
-
-            .mobile-menu-toggle {
-                display: flex;
-                top: 12px;
-                left: 12px;
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
+            
+            .logo {
+                width: 35px;
+                height: 35px;
             }
-
-            .container {
-                flex-direction: column;
-                height: 100vh;
-                width: 100vw;
+            
+            .brand-text h1 {
+                font-size: 1.2rem;
             }
-
-            .history-panel {
-                display: none;
+            
+            .brand-text p {
+                font-size: 0.7rem;
             }
-
-            .main-chat {
-                width: 100%;
-                height: 100vh;
-                padding: 50px 12px 12px 12px;
+            
+            main {
+                padding: 0.5rem;
+                height: calc(100vh - 60px);
             }
-
-            .chat-header {
-                margin-bottom: 16px;
-                gap: 8px;
+            
+            .welcome-section {
+                padding: 0.75rem;
             }
-
-            .chat-logo {
-                width: 36px;
-                height: 36px;
-            }
-
-            h1 {
-                font-size: 1.4rem;
-            }
-
-            #modelSelect {
-                font-size: 0.9rem;
-                padding: 6px 12px;
-            }
-
-            .message .content {
-                max-width: 85%;
-                padding: 12px 16px;
-                font-size: 0.95rem;
-            }
-
-            .input-container {
-                gap: 6px;
-            }
-
-            #query {
-                padding: 12px 16px 12px 36px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            .action-button {
-                width: 44px;
-                height: 44px;
-                font-size: 1.1rem;
-            }
-
-            .privacy-content {
-                padding: 1.5rem;
-                max-width: 95vw;
-            }
-
-            .privacy-content h2 {
+            
+            .welcome-section h2 {
                 font-size: 1.3rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .welcome-section p {
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .chat-container {
+                padding: 0.75rem;
+                height: calc(100vh - 200px);
+            }
+            
+            .chat-messages {
+                padding: 0.75rem;
+                min-height: 150px;
+            }
+            
+            .message {
+                padding: 0.75rem 1rem;
+                margin-bottom: 0.75rem;
+                max-width: 95%;
+                font-size: 0.85rem;
             }
 
-            .privacy-buttons {
+            .header-content {
+                padding: 0 0.5rem;
+            }
+
+            .chat-input-section {
                 flex-direction: column;
-                align-items: center;
+                gap: 0.5rem;
             }
 
-            .privacy-accept, .privacy-decline {
+            .input-wrapper {
                 width: 100%;
-                max-width: 200px;
             }
 
-            .caution-message {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-                margin: 8px auto 0;
+            .input-controls {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
             }
         }
 
         @media (max-width: 480px) {
-            .chat-header {
-                flex-direction: column;
-                gap: 12px;
+            .logo-section {
+                gap: 0.5rem;
             }
-
-            .main-chat {
-                padding: 12px 8px 8px 8px;
+            
+            .brand-text h1 {
+                font-size: 1rem;
             }
-
-            .message .content {
-                max-width: 90%;
-                padding: 10px 14px;
+            
+            .brand-text p {
+                display: none;
             }
-
-            .history-panel {
-                height: 160px;
-                padding: 8px;
+            
+            .welcome-section h2 {
+                font-size: 1rem;
             }
-
-            .main-chat {
-                height: calc(100vh - 160px);
+            
+            .welcome-section p {
+                font-size: 0.8rem;
             }
-        }
-
-        /* Accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+            
+            .chat-container {
+                height: calc(100vh - 140px);
             }
         }
 
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-            :root {
-                --border-color: #000;
-                --shadow-light: rgba(0,0,0,0.5);
-                --shadow-medium: rgba(0,0,0,0.7);
-            }
-
-            [data-theme="dark"] {
-                --border-color: #fff;
-                --color-text: #fff;
-                --color-text-light: #ccc;
+        @media (min-height: 800px) {
+            .chat-container {
+                height: calc(100vh - 320px);
             }
         }
 
-        /* Focus indicators for keyboard navigation */
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible {
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
+        @media (min-height: 1000px) {
+            .chat-container {
+                height: calc(100vh - 350px);
+            }
+        }
+
+            .image-preview {
+                max-width: 80px;
+                max-height: 80px;
+            }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Security notice */
+        .security-notice {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .security-notice.show {
+            display: block;
+            animation: slideIn 0.3s ease;
         }
     </style>
 </head>
 <body>
     <!-- Privacy Policy Modal -->
-    <div class="privacy-modal" id="privacyModal">
-        <div class="privacy-content">
-            <h2>Welcome to HealthMama AI</h2>
-            
-            <div class="privacy-summary">
-                <div style="text-align: left; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
-                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">🏥</span>
-                        <span><strong>AI-Powered Health Assistant</strong> specializing in maternal health, diabetes, and pregnancy information</span>
+    <div id="privacyModal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Privacy & Terms</h3>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-summary">
+                    <h4>Welcome to HealthMama AI</h4>
+                    <p>We respect your privacy and are committed to protecting your personal information. By using our service, you agree to our data handling practices outlined below.</p>
+                    <button class="view-details-btn" onclick="togglePrivacyDetails()">
+                        <i class="fas fa-chevron-down" id="detailsIcon"></i> View Details
+                    </button>
+                </div>
+                
+                <div id="privacyDetails" class="privacy-details">
+                    <div class="privacy-section">
+                        <h4><i class="fas fa-database"></i> Data Collection</h4>
+                        <p>We collect only the health information you voluntarily share during conversations to provide personalized health guidance. No personal identifying information is required or stored.</p>
                     </div>
                     
-                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
-                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">🔒</span>
-                        <span><strong>Privacy Protected:</strong> All conversations are stored locally in your browser and remain private</span>
+                    <div class="privacy-section">
+                        <h4><i class="fas fa-lock"></i> Data Security</h4>
+                        <p>All conversations are encrypted and processed securely. We implement industry-standard security measures to protect your information from unauthorized access.</p>
                     </div>
                     
-                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
-                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">⚠️</span>
-                        <span><strong>Medical Disclaimer:</strong> This service provides educational information only - not medical diagnosis or treatment</span>
+                    <div class="privacy-section">
+                        <h4><i class="fas fa-share-alt"></i> Data Sharing</h4>
+                        <p>We do not sell, rent, or share your personal health information with third parties. Data is used solely to improve our AI health guidance service.</p>
                     </div>
                     
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">✨</span>
-                        <span><strong>Professional Standards:</strong> Built with healthcare compliance and ethical AI principles</span>
+                    <div class="privacy-section">
+                        <h4><i class="fas fa-user-md"></i> Medical Disclaimer</h4>
+                        <p>HealthMama AI provides educational information only and does not replace professional medical advice. Always consult healthcare professionals for medical decisions.</p>
+                    </div>
+                    
+                    <div class="privacy-section">
+                        <h4><i class="fas fa-cookie-bite"></i> Cookies & Storage</h4>
+                        <p>We use minimal local storage to remember your preferences (like dark mode). No tracking cookies or third-party analytics are used.</p>
                     </div>
                 </div>
             </div>
-
-            <button class="view-details-btn" onclick="togglePrivacyDetails()" id="viewDetailsBtn">
-                📋 View Complete Terms & Privacy Policy
-            </button>
-
-            <div class="privacy-details" id="privacyDetails">
-                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">🔐 Data Privacy & Collection</h3>
-                <div style="margin-bottom: 1.5rem;">
-                    <p style="margin-bottom: 0.5rem; font-weight: 600;">Information We Collect:</p>
-                    <ul style="margin-left: 1rem;">
-                        <li>Chat conversations and queries you submit to our AI assistant</li>
-                        <li>Local browser preferences and settings for improved user experience</li>
-                        <li>Anonymous usage patterns to enhance service quality</li>
-                    </ul>
-                    
-                    <p style="margin: 1rem 0 0.5rem; font-weight: 600;">Data Protection:</p>
-                    <ul style="margin-left: 1rem;">
-                        <li><strong>Local Storage:</strong> All chat history is stored locally in your browser only</li>
-                        <li><strong>Secure Processing:</strong> Conversations are processed through OpenAI's encrypted API</li>
-                        <li><strong>No Data Sales:</strong> We never sell, share, or distribute your personal information</li>
-                        <li><strong>User Control:</strong> You can delete your chat history at any time</li>
-                        <li><strong>No External Tracking:</strong> We do not use third-party analytics or tracking tools</li>
-                    </ul>
-                </div>
-
-                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">⚕️ Medical Disclaimer & Limitations</h3>
-                <div style="margin-bottom: 1.5rem; background: var(--bg-panel); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
-                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: #ff9800;">IMPORTANT MEDICAL NOTICE:</p>
-                    <ul style="margin-left: 1rem;">
-                        <li><strong>Educational Purpose Only:</strong> This AI provides general health information for educational purposes</li>
-                        <li><strong>Not Medical Advice:</strong> Content is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
-                        <li><strong>Consult Healthcare Providers:</strong> Always seek advice from qualified healthcare professionals for medical concerns</li>
-                        <li><strong>Emergency Situations:</strong> For medical emergencies, immediately contact emergency services (911)</li>
-                        <li><strong>Individual Variation:</strong> Health information may not apply to your specific medical situation</li>
-                        <li><strong>No Doctor-Patient Relationship:</strong> Use of this service does not create a medical relationship</li>
-                    </ul>
-                </div>
-
-                <h3 style="color: var(--color-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">📋 Terms of Service</h3>
-                <div style="margin-bottom: 1rem;">
-                    <p style="margin-bottom: 0.5rem; font-weight: 600;">Acceptable Use:</p>
-                    <ul style="margin-left: 1rem;">
-                        <li><strong>Lawful Purpose:</strong> Use this service only for legitimate, lawful health information purposes</li>
-                        <li><strong>Personal Use:</strong> Service is intended for individual, non-commercial use only</li>
-                        <li><strong>No Misuse:</strong> Do not attempt to exploit, hack, or abuse the service</li>
-                        <li><strong>Respectful Interaction:</strong> Engage with the AI assistant in a respectful manner</li>
-                    </ul>
-                    
-                    <p style="margin: 1rem 0 0.5rem; font-weight: 600;">Service Limitations:</p>
-                    <ul style="margin-left: 1rem;">
-                        <li><strong>As-Is Basis:</strong> Service is provided "as is" without warranties of any kind</li>
-                        <li><strong>Availability:</strong> We do not guarantee uninterrupted service availability</li>
-                        <li><strong>Modifications:</strong> We reserve the right to modify or discontinue the service</li>
-                        <li><strong>Content Accuracy:</strong> While we strive for accuracy, AI responses may contain errors</li>
-                    </ul>
-                </div>
-
-                <div style="background: var(--bg-input); padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
-                    <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-light); text-align: center;">
-                        <strong>Last Updated:</strong> October 2025 | <strong>Version:</strong> 2.0<br>
-                        For questions about this policy, contact our support team.
-                    </p>
-                </div>
-            </div>
-
-            <div style="background: var(--bg-panel); padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid var(--color-primary);">
-                <p style="margin: 0; font-size: 0.95rem; color: var(--color-text);">
-                    <strong>By continuing, you acknowledge that:</strong><br>
-                    • You have read and understand this privacy policy and terms of service<br>
-                    • You understand this is an AI assistant for informational purposes only<br>
-                    • You will not use this service as a substitute for professional medical care
-                </p>
-            </div>
-
-            <div class="privacy-buttons">
-                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">✅ I Accept - Continue to HealthMama AI</button>
-                <button class="privacy-decline" onclick="declinePrivacyPolicy()">❌ Decline</button>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="acceptPrivacyPolicy()">
+                    <i class="fas fa-check"></i> I Agree & Continue
+                </button>
             </div>
         </div>
-    </div>
-
-    <!-- Dark Mode Toggle -->
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-        <i class="fas fa-sun" id="themeIcon"></i>
-    </button>
-
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Open menu">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <h2>Chat History</h2>
-        <button class="new-chat-button" onclick="clearChat(true); closeMobileMenu();">
-            <i class="fa-solid fa-plus"></i> New Chat
-        </button>
-        <div class="history-list" id="mobileHistoryList"></div>
-        <button class="clear-history-button" onclick="confirmClearAllHistory(); closeMobileMenu();">
-            <i class="fa-solid fa-trash"></i> Clear All History
-        </button>
     </div>
 
     <!-- Main Application -->
-    <div class="container" id="mainApp" style="opacity: 0.3; pointer-events: none;">
-        <div class="history-panel" id="historyPanel">
-            <button class="new-chat-button" onclick="clearChat(true)">
-                <i class="fa-solid fa-plus"></i> New Chat
-            </button>
-            <div class="history-list" id="historyList"></div>
-            <button class="clear-history-button" onclick="confirmClearAllHistory()">
-                <i class="fa-solid fa-trash"></i> Clear All History
-            </button>
-        </div>
-        
-        <div class="main-chat">
-            <div class="chat-header">
-                <img src="{{ url_for('static', filename='assets/healthmama-logo.png') }}" alt="Health Mama Logo" class="chat-logo" />
-                <h1>HealthMama AI</h1>
-                <select id="modelSelect" aria-label="Select AI Model">
-                    <option value="diabetes">Gestational Diabetes</option>
-                    <option value="preeclampsia">Pre-eclampsia</option>
-                </select>
-            </div>
-            
-            <div class="messages" id="messages" aria-live="polite" aria-label="Chat messages"></div>
-            
-            <button id="scrollLatest" onclick="scrollToLatest()" title="Scroll to latest message" aria-label="Scroll to latest message">
-                <i class="fa-solid fa-arrow-down"></i>
-            </button>
-            
-            <div class="typing-indicator" id="typingIndicator" aria-live="polite">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-            
-            <div class="input-container">
-                <div class="input-wrapper">
-                    <label for="image-upload" class="image-upload-label">
-                        <i class="fa-solid fa-paperclip"></i>
-                    </label>
-                    <input type="file" id="image-upload" accept="image/*">
-                    <input type="text" id="query" placeholder="Ask HealthMama about pregnancy, health, or nutrition..." required aria-label="Type your question here">
+    <div id="mainApp" style="display: none; height: 100vh; overflow: hidden;">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo float-animation">
+                        <img src="/static/assets/healthmama-logo.png" alt="HealthMama AI" />
+                    </div>
+                    <div class="brand-text">
+                        <h1>HealthMama AI</h1>
+                        <p>Your Trusted Health Companion</p>
+                    </div>
                 </div>
-                <img id="image-preview" src="" alt="Image preview" />
-                <button class="action-button send-button" onclick="sendMessage()" aria-label="Send message">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-                <button class="action-button voice-record-button" onclick="toggleVoiceRecording()" aria-label="Record voice message" title="Record voice message">
-                    <i class="fa-solid fa-microphone"></i>
-                </button>
+                
+                <div class="header-controls">
+                    <!-- Professional 3-dots Menu -->
+                    <div class="menu-container">
+                        <button class="menu-toggle-btn" onclick="toggleMainMenu()">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="menu-dropdown" id="mainMenuDropdown">
+                            <div class="menu-item" onclick="newChat()">
+                                <i class="fas fa-plus"></i> New Chat
+                            </div>
+                            <div class="menu-item" onclick="showHistory()">
+                                <i class="fas fa-history"></i> History
+                            </div>
+                            <div class="menu-item" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> Clear History
+                            </div>
+                            <div class="menu-item" onclick="toggleTheme()">
+                                <i class="fas fa-moon" id="menuThemeIcon"></i> 
+                                <span id="menuThemeText">Dark Mode</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="caution-message">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                HealthMama AI can make mistakes. Check important info.
+        </header>
+
+        <main class="main-container">
+            <section class="welcome-section">
+                <h2>Welcome to HealthMama AI</h2>
+                <p>Your personal health companion for pregnancy, diabetes management, and maternal wellness. Choose your specialized model below to get started:</p>
+                <div class="model-selector">
+                    <label for="modelSelect"><strong>Select Health Focus:</strong></label>
+                    <select id="modelSelect" class="model-select" onchange="changeModel()">
+                        <option value="diabetes">🩺 Gestational Diabetes</option>
+                        <option value="preeclampsia">🤱 Pre-eclampsia</option>
+                    </select>
+                    <span id="modelIndicator" class="model-indicator">
+                        <i class="fas fa-stethoscope"></i>
+                        <span id="modelText">Diabetes Model</span>
+                    </span>
+                </div>
+            </section>
+
+            <div class="security-notice" id="securityNotice">
+                <i class="fas fa-exclamation-triangle"></i> 
+                <strong>Security Notice:</strong> Please avoid sharing sensitive personal information like full names, addresses, or medical record numbers.
             </div>
-        </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        <i class="fas fa-robot"></i> Hello! I'm HealthMama AI, your trusted health companion. I'm here to help with questions about pregnancy, diabetes management, and maternal health. How can I assist you today?
+                    </div>
+                </div>
+                
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <span style="margin-left: 1rem;">HealthMama is thinking...</span>
+                </div>
+                
+                <div class="chat-input-section">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="userInput" 
+                            class="chat-input" 
+                            placeholder="Ask me about your health, pregnancy, or diabetes management..."
+                            maxlength="2000"
+                            onkeypress="handleKeyPress(event)"
+                        ></textarea>
+                        <div class="input-controls">
+                            <button class="input-btn" id="imageBtn" title="Upload Image" onclick="triggerImageUpload()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <button class="input-btn" id="voiceBtn" title="Record Voice Message" onclick="toggleVoiceRecording()">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="sendMessage()" id="sendButton">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                    
+                    <!-- Hidden file inputs -->
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelection(this)">
+                    
+                    <!-- Image preview -->
+                    <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
+                        <img id="imagePreview" class="image-preview" alt="Image preview">
+                        <button class="remove-image" onclick="removeImage()" title="Remove image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Recording indicator -->
+                    <span id="recordingIndicator" class="recording-indicator" style="display: none;">
+                        <i class="fas fa-circle"></i> Recording...
+                    </span>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Privacy Policy Management
-        function checkPrivacyAcceptance() {
-            const accepted = localStorage.getItem('healthmama_privacy_accepted');
-            if (accepted === 'true') {
-                hidePrivacyModal();
-            } else {
-                showPrivacyModal();
+        // Global variables
+        let chatHistory = JSON.parse(localStorage.getItem('healthmama_chat_history') || '[]');
+        let currentTheme = localStorage.getItem('healthmama_theme') || 'light';
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let selectedImage = null;
+        let selectedModel = localStorage.getItem('healthmama_selected_model') || 'diabetes';
+        let modelChatHistory = JSON.parse(localStorage.getItem('healthmama_model_chat_history') || '{}');
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user has accepted privacy policy
+            const hasAcceptedPrivacy = localStorage.getItem('healthmama_privacy_accepted');
+            if (hasAcceptedPrivacy) {
+                showMainApp();
+            }
+            
+            // Apply saved theme
+            applyTheme(currentTheme);
+            
+            // Initialize model selection
+            initializeModel();
+            
+            // Load chat history for current model
+            loadModelChatHistory();
+        });
+
+        // Model Selection Functions
+        function initializeModel() {
+            const modelSelect = document.getElementById('modelSelect');
+            const modelIndicator = document.getElementById('modelIndicator');
+            const modelText = document.getElementById('modelText');
+            
+            // Set the saved model
+            modelSelect.value = selectedModel;
+            
+            // Apply model theme
+            applyModelTheme();
+            
+            // Update indicator
+            updateModelIndicator();
+            
+            // Initialize chat history for models if not exists
+            if (!modelChatHistory[selectedModel]) {
+                modelChatHistory[selectedModel] = [];
             }
         }
 
-        function showPrivacyModal() {
-            document.getElementById('privacyModal').classList.add('show');
-            document.getElementById('mainApp').style.opacity = '0.3';
-            document.getElementById('mainApp').style.pointerEvents = 'none';
+        function changeModel() {
+            const modelSelect = document.getElementById('modelSelect');
+            const newModel = modelSelect.value;
+            
+            // Save current chat if there are messages
+            saveCurrentModelChatHistory();
+            
+            // Switch to new model
+            selectedModel = newModel;
+            localStorage.setItem('healthmama_selected_model', selectedModel);
+            
+            // Apply new theme
+            applyModelTheme();
+            
+            // Update indicator
+            updateModelIndicator();
+            
+            // Load chat history for new model
+            loadModelChatHistory();
+            
+            // Show welcome message for new model
+            showModelWelcome();
         }
 
-        function hidePrivacyModal() {
-            document.getElementById('privacyModal').classList.remove('show');
-            document.getElementById('mainApp').style.opacity = '1';
-            document.getElementById('mainApp').style.pointerEvents = 'auto';
+        function applyModelTheme() {
+            document.body.classList.remove('diabetes-theme', 'preeclampsia-theme');
+            document.body.classList.add(`${selectedModel}-theme`);
+        }
+
+        function updateModelIndicator() {
+            const modelText = document.getElementById('modelText');
+            const modelIndicator = document.getElementById('modelIndicator');
+            
+            if (selectedModel === 'preeclampsia') {
+                modelText.textContent = 'Pre-eclampsia Model';
+                modelIndicator.innerHTML = '<i class="fas fa-baby"></i><span id="modelText">Pre-eclampsia Model</span>';
+            } else {
+                modelText.textContent = 'Diabetes Model';
+                modelIndicator.innerHTML = '<i class="fas fa-stethoscope"></i><span id="modelText">Diabetes Model</span>';
+            }
+        }
+
+        function showModelWelcome() {
+            const chatMessages = document.getElementById('chatMessages');
+            let welcomeMessage = '';
+            
+            if (selectedModel === 'preeclampsia') {
+                welcomeMessage = `
+                    <div class="message assistant">
+                        <i class="fas fa-baby"></i> Welcome to HealthMama AI - Pre-eclampsia Support! 
+                        <br><br>I'm specialized in providing information about pre-eclampsia, maternal health, and pregnancy complications. 
+                        I can help you understand symptoms, management, and care recommendations. 
+                        <br><br>How can I assist you with your maternal health journey today?
+                    </div>
+                `;
+            } else {
+                welcomeMessage = `
+                    <div class="message assistant">
+                        <i class="fas fa-stethoscope"></i> Welcome to HealthMama AI - Diabetes Support! 
+                        <br><br>I'm specialized in providing information about gestational diabetes, blood sugar management, and diabetes care during pregnancy. 
+                        I can help with diet recommendations, monitoring guidance, and general diabetes health support.
+                        <br><br>How can I assist you with your diabetes management today?
+                    </div>
+                `;
+            }
+            
+            chatMessages.innerHTML = welcomeMessage;
+        }
+
+        function saveCurrentModelChatHistory() {
+            const chatMessages = document.getElementById('chatMessages');
+            const messages = Array.from(chatMessages.children);
+            
+            // Convert DOM messages to storable format
+            const messageHistory = messages.map(msg => {
+                const isUser = msg.classList.contains('user');
+                const content = msg.textContent || msg.innerText;
+                return {
+                    type: isUser ? 'user' : 'assistant',
+                    content: content,
+                    timestamp: new Date().toISOString()
+                };
+            });
+            
+            modelChatHistory[selectedModel] = messageHistory;
+            localStorage.setItem('healthmama_model_chat_history', JSON.stringify(modelChatHistory));
+        }
+
+        function loadModelChatHistory() {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (!modelChatHistory[selectedModel] || modelChatHistory[selectedModel].length === 0) {
+                showModelWelcome();
+                return;
+            }
+            
+            // Load stored messages
+            let messagesHTML = '';
+            modelChatHistory[selectedModel].forEach(msg => {
+                const icon = msg.type === 'user' ? '<i class="fas fa-user"></i>' : 
+                            (selectedModel === 'preeclampsia' ? '<i class="fas fa-baby"></i>' : '<i class="fas fa-stethoscope"></i>');
+                messagesHTML += `
+                    <div class="message ${msg.type}">
+                        ${icon} ${msg.content}
+                    </div>
+                `;
+            });
+            
+            chatMessages.innerHTML = messagesHTML;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Privacy Policy Functions
+        function togglePrivacyDetails() {
+            const details = document.getElementById('privacyDetails');
+            const icon = document.getElementById('detailsIcon');
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                details.classList.add('show');
+                icon.className = 'fas fa-chevron-up';
+            }
         }
 
         function acceptPrivacyPolicy() {
             localStorage.setItem('healthmama_privacy_accepted', 'true');
-            hidePrivacyModal();
+            document.getElementById('privacyModal').style.display = 'none';
+            showMainApp();
         }
 
-        function declinePrivacyPolicy() {
-            alert('You must accept the privacy policy to use HealthMama AI. The page will now close.');
-            window.close();
+        function showMainApp() {
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userInput').focus();
         }
 
-        function togglePrivacyDetails() {
-            const details = document.getElementById('privacyDetails');
-            const btn = document.getElementById('viewDetailsBtn');
-            
-            if (details.classList.contains('show')) {
-                details.classList.remove('show');
-                btn.textContent = '📋 View Complete Terms & Privacy Policy';
-            } else {
-                details.classList.add('show');
-                btn.textContent = '📖 Hide Policy Details';
-            }
+        // Menu Functions
+        function toggleMainMenu() {
+            const dropdown = document.getElementById('mainMenuDropdown');
+            dropdown.classList.toggle('active');
         }
 
-        // Dark Mode Management
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('healthmama_theme') || 'light';
-            applyTheme(savedTheme);
-        }
-
+        // Theme Functions
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            applyTheme(newTheme);
-            localStorage.setItem('healthmama_theme', newTheme);
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+            localStorage.setItem('healthmama_theme', currentTheme);
         }
 
         function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            const icon = document.getElementById('themeIcon');
+            document.body.setAttribute('data-theme', theme);
+            const menuThemeIcon = document.getElementById('menuThemeIcon');
+            const menuThemeText = document.getElementById('menuThemeText');
+            
             if (theme === 'dark') {
-                icon.className = 'fas fa-moon';
+                if (menuThemeIcon) menuThemeIcon.className = 'fas fa-sun';
+                if (menuThemeText) menuThemeText.textContent = 'Light Mode';
             } else {
-                icon.className = 'fas fa-sun';
+                if (menuThemeIcon) menuThemeIcon.className = 'fas fa-moon';
+                if (menuThemeText) menuThemeText.textContent = 'Dark Mode';
             }
         }
 
-        // Mobile Menu Management
+        // Mobile Menu Functions
         function toggleMobileMenu() {
-            const overlay = document.getElementById('mobileMenuOverlay');
-            const menu = document.getElementById('mobileMenu');
+            const dropdown = document.getElementById('mobileMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menuContainer = document.querySelector('.menu-container');
+            const dropdown = document.getElementById('mainMenuDropdown');
             
-            if (overlay.classList.contains('show')) {
-                closeMobileMenu();
-            } else {
-                openMobileMenu();
+            if (menuContainer && !menuContainer.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Input Validation and Security
+        function validateInput(input) {
+            // Remove potentially dangerous content
+            const sanitized = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+            
+            // Check for file upload attempts
+            const filePatterns = /\.(exe|bat|cmd|scr|pif|com|js|vbs|jar|app|deb|rpm|dmg|pkg)$/i;
+            const hasFile = filePatterns.test(input);
+            
+            // Check for suspicious patterns
+            const suspiciousPatterns = [
+                /javascript:/i,
+                /data:text\/html/i,
+                /vbscript:/i,
+                /<iframe/i,
+                /<object/i,
+                /<embed/i,
+                /eval\(/i,
+                /document\.cookie/i
+            ];
+            
+            const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(input));
+            
+            if (hasFile || isSuspicious) {
+                showSecurityNotice();
+                return null;
+            }
+            
+            return sanitized.trim();
+        }
+
+        function showSecurityNotice(customMessage = null) {
+            const notice = document.getElementById('securityNotice');
+            if (customMessage) {
+                notice.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <strong>Notice:</strong> ${customMessage}`;
+            }
+            notice.classList.add('show');
+            setTimeout(() => {
+                notice.classList.remove('show');
+            }, 5000);
+        }
+
+        // Chat Functions
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
             }
         }
 
-        function openMobileMenu() {
-            const overlay = document.getElementById('mobileMenuOverlay');
-            const menu = document.getElementById('mobileMenu');
-            
-            overlay.classList.add('show');
-            menu.classList.add('show');
-            
-            // Sync mobile history list with main history list
-            syncMobileHistoryList();
+        // Multimodal Functions
+        function triggerImageUpload() {
+            document.getElementById('imageInput').click();
         }
 
-        function closeMobileMenu() {
-            const overlay = document.getElementById('mobileMenuOverlay');
-            const menu = document.getElementById('mobileMenu');
-            
-            overlay.classList.remove('show');
-            menu.classList.remove('show');
-        }
-
-        function syncMobileHistoryList() {
-            const mainHistoryList = document.getElementById('historyList');
-            const mobileHistoryList = document.getElementById('mobileHistoryList');
-            
-            // Clone the main history list content to mobile
-            mobileHistoryList.innerHTML = mainHistoryList.innerHTML;
-            
-            // Update click handlers for mobile menu items to close menu
-            const mobileItems = mobileHistoryList.querySelectorAll('.history-item');
-            mobileItems.forEach(item => {
-                const originalOnClick = item.onclick;
-                item.onclick = function() {
-                    if (originalOnClick) originalOnClick();
-                    closeMobileMenu();
-                };
-            });
-            
-            // Update delete buttons to close menu after action
-            const mobileDeleteButtons = mobileHistoryList.querySelectorAll('.more-options-menu button');
-            mobileDeleteButtons.forEach(btn => {
-                const originalOnClick = btn.onclick;
-                btn.onclick = function(e) {
-                    if (originalOnClick) originalOnClick(e);
-                    closeMobileMenu();
-                };
-            });
-        }
-
-        // Voice Recording
-        let mediaRecorder;
-        let audioChunks = [];
-        let isRecording = false;
-
-        async function toggleVoiceRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                await startRecording();
-            }
-        }
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = e => {
-                    if (e.data.size > 0) audioChunks.push(e.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    sendAudioMessage(audioBlob);
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
+        function handleImageSelection(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
                 
-                const voiceBtn = document.querySelector('.voice-record-button');
-                voiceBtn.classList.add('recording');
-                
-            } catch (err) {
-                alert('Could not access microphone: ' + err.message);
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                const voiceBtn = document.querySelector('.voice-record-button');
-                voiceBtn.classList.remove('recording');
-            }
-        }
-
-        function sendAudioMessage(blob) {
-            const typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'block';
-            
-            const formData = new FormData();
-            formData.append('audio', blob, 'audio.webm');
-            formData.append('model', selectedModel);
-            
-            fetch('/ask', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                typingIndicator.style.display = 'none';
-                if (data.response) appendMessage(data.response, false);
-                if (data.audio_url) {
-                    const audio = new Audio(data.audio_url);
-                    audio.play();
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showSecurityNotice('Please select a valid image file.');
+                    return;
                 }
-            })
-            .catch(error => {
-                typingIndicator.style.display = 'none';
-                appendMessage('Error: ' + error, false);
-            });
-        }
-
-        // Image Upload Preview
-        const imageInput = document.getElementById('image-upload');
-        const imagePreview = document.getElementById('image-preview');
-
-        imageInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
+                
+                // Validate file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    showSecurityNotice('Image size must be less than 5MB.');
+                    return;
+                }
+                
+                selectedImage = file;
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const imagePreview = document.getElementById('imagePreview');
+                    const previewContainer = document.getElementById('imagePreviewContainer');
+                    
                     imagePreview.src = e.target.result;
-                    imagePreview.style.display = 'inline-block';
+                    previewContainer.style.display = 'block';
                 };
-                reader.readAsDataURL(this.files[0]);
-            } else {
-                imagePreview.src = '';
-                imagePreview.style.display = 'none';
-            }
-        });
-
-        // Model Selection and Chat Logic
-        let selectedModel = localStorage.getItem('selectedModel') || 'diabetes';
-        const modelSelect = document.getElementById('modelSelect');
-        modelSelect.value = selectedModel;
-
-        function setThemeByModel() {
-            document.body.classList.remove('diabetes-theme', 'preeclampsia-theme');
-            if (selectedModel === 'preeclampsia') {
-                document.body.classList.add('preeclampsia-theme');
-            } else {
-                document.body.classList.add('diabetes-theme');
+                reader.readAsDataURL(file);
             }
         }
 
-        setThemeByModel();
+        function removeImage() {
+            selectedImage = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+        }
 
-        modelSelect.addEventListener('change', function() {
-            selectedModel = this.value;
-            localStorage.setItem('selectedModel', selectedModel);
-            setThemeByModel();
-            showWelcome();
-            loadModelChatHistory();
-        });
-
-        // Chat History Management
-        let chatHistoryAll = JSON.parse(localStorage.getItem('chatHistoryAll')) || {};
-        if (!chatHistoryAll[selectedModel]) chatHistoryAll[selectedModel] = {};
-        let chatHistory = chatHistoryAll[selectedModel];
-        let firstPrompt = '';
-
-        const messagesElement = document.getElementById('messages');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const queryInput = document.getElementById('query');
-        const historyList = document.getElementById('historyList');
-
-        function appendMessage(content, isUser) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', isUser ? 'user' : 'bot');
-
-            // Avatar
-            const avatar = document.createElement('div');
-            avatar.classList.add('avatar');
-            if (isUser) {
-                avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+        async function toggleVoiceRecording() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            const recordingIndicator = document.getElementById('recordingIndicator');
+            
+            if (isRecording) {
+                // Stop recording
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                }
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                recordingIndicator.style.display = 'none';
             } else {
-                avatar.innerHTML = selectedModel === 'preeclampsia' ? 
-                    '<i class="fa-solid fa-baby"></i>' : 
-                    '<i class="fa-solid fa-user-doctor"></i>';
-            }
-            messageElement.appendChild(avatar);
-
-            // Content
-            const contentElement = document.createElement('div');
-            contentElement.classList.add('content');
-            contentElement.textContent = content;
-            messageElement.appendChild(contentElement);
-
-            // Edit button for user messages
-            if (isUser) {
-                const editBtn = document.createElement('button');
-                editBtn.className = 'edit-btn';
-                editBtn.title = 'Edit and regenerate';
-                editBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
-                editBtn.onclick = function() {
-                    // Edit functionality implementation
-                    const editWrapper = document.createElement('div');
-                    editWrapper.style.display = 'flex';
-                    editWrapper.style.alignItems = 'center';
-                    editWrapper.style.width = '100%';
+                // Start recording
+                try {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        showSecurityNotice('Audio recording not supported in this browser.');
+                        return;
+                    }
                     
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = contentElement.textContent;
-                    input.className = 'edit-input';
-                    input.style.flex = '1';
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
                     
-                    const sendBtn = document.createElement('button');
-                    sendBtn.className = 'save-btn';
-                    sendBtn.title = 'Send edited prompt';
-                    sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
-                    sendBtn.style.marginLeft = '8px';
-                    
-                    sendBtn.onclick = () => {
-                        const newPrompt = input.value.trim();
-                        if (!newPrompt) return;
-                        
-                        // Replace input with new content
-                        contentElement.textContent = newPrompt;
-                        editWrapper.replaceWith(contentElement);
-                        editBtn.style.display = '';
-                        
-                        // Regenerate response
-                        regenerateResponse(messageElement, newPrompt);
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
                     };
                     
-                    input.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            sendBtn.click();
-                        }
-                    });
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        sendAudioMessage(audioBlob);
+                        
+                        // Stop all tracks to release microphone
+                        stream.getTracks().forEach(track => track.stop());
+                    };
                     
-                    editWrapper.appendChild(input);
-                    editWrapper.appendChild(sendBtn);
-                    contentElement.replaceWith(editWrapper);
-                    editBtn.style.display = 'none';
-                    input.focus();
-                };
-                messageElement.appendChild(editBtn);
+                    mediaRecorder.start();
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    recordingIndicator.style.display = 'inline-block';
+                    
+                } catch (error) {
+                    console.error('Error starting recording:', error);
+                    showSecurityNotice('Could not start audio recording. Please check microphone permissions.');
+                }
             }
-
-            messagesElement.appendChild(messageElement);
-            scrollToLatest();
         }
 
-        function regenerateResponse(userMessageElement, newPrompt) {
-            typingIndicator.style.display = 'block';
+        function sendAudioMessage(audioBlob) {
+            // Show loading indicator
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('sendButton').disabled = true;
             
-            // Remove subsequent messages
-            let nextElement = userMessageElement.nextElementSibling;
-            while (nextElement) {
-                const toRemove = nextElement;
-                nextElement = nextElement.nextElementSibling;
-                toRemove.remove();
-            }
-            
-            // Send new request
+            // Create FormData for audio upload
             const formData = new FormData();
-            formData.append('query', newPrompt);
+            formData.append('audio', audioBlob, 'voice_message.webm');
             formData.append('model', selectedModel);
             
+            // Send to backend
             fetch('/ask', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                typingIndicator.style.display = 'none';
-                appendMessage(data.response, false);
+                // Hide loading indicator
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('sendButton').disabled = false;
+                
+                if (data.response) {
+                    // Add user message placeholder for voice
+                    addMessage('🎤 Voice message sent', 'user');
+                    addMessage(data.response, 'assistant');
+                    
+                    // Play audio response if available
+                    if (data.audio_url) {
+                        const audio = new Audio(data.audio_url);
+                        audio.play().catch(e => console.log('Audio playback failed:', e));
+                    }
+                } else {
+                    addMessage('I apologize, but I encountered an error processing your voice message.', 'assistant');
+                }
             })
             .catch(error => {
-                typingIndicator.style.display = 'none';
-                appendMessage('Error: ' + error, false);
+                console.error('Error:', error);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('sendButton').disabled = false;
+                addMessage('I apologize, but I encountered a connection error with your voice message.', 'assistant');
             });
-        }
-
-        function showWelcome() {
-            messagesElement.innerHTML = '';
-            if (selectedModel === 'preeclampsia') {
-                appendMessage("👋 Welcome to HealthMama AI!\n\nAsk me anything about preeclampsia, maternal health, or pregnancy. I'm here to help you with evidence-based answers.", false);
-            } else {
-                appendMessage("👋 Welcome to HealthMama AI!\n\nAsk me anything about diabetes, health, or nutrition. I'm here to help you with evidence-based answers.", false);
-            }
-        }
-
-        function scrollToLatest() {
-            messagesElement.scrollTop = messagesElement.scrollHeight;
-            
-            const scrollBtn = document.getElementById('scrollLatest');
-            if (messagesElement.scrollHeight - messagesElement.clientHeight > 100) {
-                scrollBtn.style.display = 'block';
-            } else {
-                scrollBtn.style.display = 'none';
-            }
-        }
-
-        function saveChatHistory(title) {
-            const messages = messagesElement.innerHTML;
-            chatHistory[title] = messages;
-            chatHistoryAll[selectedModel] = chatHistory;
-            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-            updateHistoryList();
-        }
-
-        function loadChat(title) {
-            if (chatHistory[title]) {
-                messagesElement.innerHTML = chatHistory[title];
-                scrollToLatest();
-            }
-        }
-
-        function loadModelChatHistory() {
-            chatHistory = chatHistoryAll[selectedModel] || {};
-            updateHistoryList();
-            
-            const titles = Object.keys(chatHistory);
-            if (titles.length > 0) {
-                const lastTitle = titles[titles.length - 1];
-                loadChat(lastTitle);
-                firstPrompt = lastTitle;
-            } else {
-                showWelcome();
-            }
-        }
-
-        function updateHistoryList() {
-            historyList.innerHTML = '';
-            for (const title in chatHistory) {
-                const item = document.createElement('div');
-                item.classList.add('history-item');
-                item.textContent = title.length > 30 ? title.substring(0, 30) + '...' : title;
-
-                const moreOptions = document.createElement('div');
-                moreOptions.classList.add('more-options');
-                moreOptions.textContent = '⋮';
-                moreOptions.onclick = (e) => {
-                    e.stopPropagation();
-                    toggleMenu(item);
-                };
-
-                const moreOptionsMenu = document.createElement('div');
-                moreOptionsMenu.classList.add('more-options-menu');
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete Chat';
-                deleteButton.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteChat(title);
-                };
-                moreOptionsMenu.appendChild(deleteButton);
-
-                item.appendChild(moreOptions);
-                item.appendChild(moreOptionsMenu);
-
-                item.onclick = () => {
-                    loadChat(title);
-                    firstPrompt = title;
-                };
-
-                historyList.appendChild(item);
-            }
-            
-            // Sync mobile history list
-            syncMobileHistoryList();
-        }
-
-        function toggleMenu(item) {
-            const menu = item.querySelector('.more-options-menu');
-            const isVisible = menu.style.display === 'block';
-            
-            // Hide all other menus
-            document.querySelectorAll('.more-options-menu').forEach(m => m.style.display = 'none');
-            
-            menu.style.display = isVisible ? 'none' : 'block';
-        }
-
-        function deleteChat(title) {
-            if (confirm('Are you sure you want to delete this chat?')) {
-                delete chatHistory[title];
-                chatHistoryAll[selectedModel] = chatHistory;
-                localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-                updateHistoryList();
-                
-                if (firstPrompt === title) {
-                    showWelcome();
-                    firstPrompt = '';
-                }
-            }
-        }
-
-        function confirmClearAllHistory() {
-            if (confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
-                clearAllHistory();
-            }
-        }
-
-        function clearAllHistory() {
-            chatHistory = {};
-            chatHistoryAll[selectedModel] = chatHistory;
-            localStorage.setItem('chatHistoryAll', JSON.stringify(chatHistoryAll));
-            updateHistoryList();
-            showWelcome();
-            firstPrompt = '';
-        }
-
-        function clearChat(forceNew = false) {
-            const chatTitle = firstPrompt || 'Chat_' + new Date().toISOString();
-            if (messagesElement.innerHTML.trim() !== '') {
-                saveChatHistory(chatTitle);
-            }
-            showWelcome();
-            queryInput.value = '';
-            firstPrompt = '';
-            if (forceNew) {
-                queryInput.focus();
-            }
         }
 
         function sendMessage() {
-            const query = queryInput.value.trim();
-            if (!query && !imageInput.files[0]) {
+            const userInput = document.getElementById('userInput');
+            const message = validateInput(userInput.value);
+            
+            // Check if we have either text or image
+            if (!message && !selectedImage) {
                 return;
             }
-
-            if (!firstPrompt) {
-                firstPrompt = query.substring(0, 50);
+            
+            if (message && message.length === 0 && !selectedImage) {
+                return;
             }
-
-            appendMessage(query, true);
-            queryInput.value = '';
-
-            typingIndicator.style.display = 'block';
-
-            const formData = new FormData();
-            formData.append('query', query);
-            formData.append('model', selectedModel);
-            if (imageInput.files[0]) {
-                formData.append('image', imageInput.files[0]);
+            
+            // Display user message
+            let displayMessage = message || '';
+            if (selectedImage) {
+                displayMessage += selectedImage ? ` 📷 Image attached` : '';
             }
-
-            fetch('/ask', {
-                method: 'POST',
-                body: formData
-            })
+            
+            if (displayMessage) {
+                addMessage(displayMessage, 'user');
+            }
+            
+            userInput.value = '';
+            
+            // Show loading indicator
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('sendButton').disabled = true;
+            
+            // Prepare data for sending
+            let requestData;
+            let requestOptions;
+            
+            if (selectedImage) {
+                // Use FormData for image upload
+                requestData = new FormData();
+                requestData.append('query', message || 'Please analyze this image');
+                requestData.append('model', selectedModel);
+                requestData.append('image', selectedImage);
+                
+                requestOptions = {
+                    method: 'POST',
+                    body: requestData
+                };
+            } else {
+                // Use JSON for text-only messages
+                requestData = JSON.stringify({ 
+                    message: message,
+                    model: selectedModel 
+                });
+                
+                requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: requestData
+                };
+            }
+            
+            // Choose endpoint based on content type
+            const endpoint = selectedImage ? '/ask' : '/chat';
+            
+            // Send to backend
+            fetch(endpoint, requestOptions)
             .then(response => response.json())
             .then(data => {
-                typingIndicator.style.display = 'none';
-                appendMessage(data.response, false);
+                // Hide loading indicator
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('sendButton').disabled = false;
                 
-                // Clear image preview and file input
-                imagePreview.src = '';
-                imagePreview.style.display = 'none';
-                imageInput.value = '';
+                if (data.response) {
+                    addMessage(data.response, 'assistant');
+                    
+                    // Play audio response if available
+                    if (data.audio_url) {
+                        const audio = new Audio(data.audio_url);
+                        audio.play().catch(e => console.log('Audio playback failed:', e));
+                    }
+                } else {
+                    addMessage('I apologize, but I encountered an error. Please try again.', 'assistant');
+                }
+                
+                // Clear image selection
+                if (selectedImage) {
+                    removeImage();
+                }
             })
             .catch(error => {
-                typingIndicator.style.display = 'none';
-                appendMessage('Error: ' + error, false);
+                console.error('Error:', error);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('sendButton').disabled = false;
+                addMessage('I apologize, but I encountered a connection error. Please check your internet connection and try again.', 'assistant');
+                
+                // Clear image selection on error too
+                if (selectedImage) {
+                    removeImage();
+                }
             });
         }
 
-        // Event Listeners
-        queryInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
+        function addMessage(message, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            // Model-specific icons
+            let icon;
+            if (sender === 'user') {
+                icon = '<i class="fas fa-user"></i>';
+            } else {
+                icon = selectedModel === 'preeclampsia' ? '<i class="fas fa-baby"></i>' : '<i class="fas fa-stethoscope"></i>';
             }
-        });
+            
+            messageDiv.innerHTML = `${icon} ${message.replace(/\n/g, '<br>')}`;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Save to model-specific history immediately
+            saveMessageToHistory(sender, message);
+        }
 
-        // Close menus when clicking outside
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.more-options-menu').forEach(menu => {
-                menu.style.display = 'none';
+        function saveMessageToHistory(sender, message) {
+            // Initialize model history if not exists
+            if (!modelChatHistory[selectedModel]) {
+                modelChatHistory[selectedModel] = [];
+            }
+            
+            // Add message to model-specific history
+            modelChatHistory[selectedModel].push({
+                type: sender,
+                content: message,
+                timestamp: new Date().toISOString(),
+                model: selectedModel
             });
-        });
-
-        // Close mobile menu with ESC key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeMobileMenu();
+            
+            // Save to localStorage
+            localStorage.setItem('healthmama_model_chat_history', JSON.stringify(modelChatHistory));
+            
+            // Also save to general history for backward compatibility
+            if (sender === 'user') {
+                // Wait for assistant response before saving to general history
+                return;
             }
-        });
+            
+            // Find the corresponding user message
+            const messages = modelChatHistory[selectedModel];
+            if (messages.length >= 2) {
+                const userMsg = messages[messages.length - 2];
+                const assistantMsg = messages[messages.length - 1];
+                
+                if (userMsg.type === 'user' && assistantMsg.type === 'assistant') {
+                    chatHistory.push({
+                        timestamp: assistantMsg.timestamp,
+                        user: userMsg.content,
+                        assistant: assistantMsg.content,
+                        model: selectedModel
+                    });
+                    localStorage.setItem('healthmama_chat_history', JSON.stringify(chatHistory));
+                }
+            }
+        }
 
-        // Initialize App
-        window.onload = function() {
-            initializeTheme();
-            checkPrivacyAcceptance();
-            updateHistoryList();
-            showWelcome();
-            queryInput.focus();
-        };
+        function newChat() {
+            // Save current chat before starting new one
+            saveCurrentModelChatHistory();
+            
+            // Clear current model's history
+            modelChatHistory[selectedModel] = [];
+            localStorage.setItem('healthmama_model_chat_history', JSON.stringify(modelChatHistory));
+            
+            // Show welcome message for current model
+            showModelWelcome();
+            
+            // Focus input
+            document.getElementById('userInput').focus();
+            
+            // Close mobile menu if open
+            document.getElementById('mobileMenuDropdown').classList.remove('active');
+        }
+
+        function showHistory() {
+            const currentModelHistory = modelChatHistory[selectedModel] || [];
+            
+            if (currentModelHistory.length === 0) {
+                alert(`No chat history available for ${selectedModel === 'preeclampsia' ? 'Pre-eclampsia' : 'Diabetes'} model.`);
+                return;
+            }
+            
+            let historyText = `Chat History - ${selectedModel === 'preeclampsia' ? 'Pre-eclampsia' : 'Diabetes'} Model:\n\n`;
+            
+            for (let i = 0; i < currentModelHistory.length; i += 2) {
+                const userMsg = currentModelHistory[i];
+                const assistantMsg = currentModelHistory[i + 1];
+                
+                if (userMsg && assistantMsg) {
+                    const date = new Date(userMsg.timestamp).toLocaleDateString();
+                    historyText += `[${date}]\nYou: ${userMsg.content}\nHealthMama: ${assistantMsg.content}\n${'='.repeat(50)}\n`;
+                }
+            }
+            
+            alert(historyText);
+            
+            // Close mobile menu if open
+            document.getElementById('mobileMenuDropdown').classList.remove('active');
+        }
+
+        function clearHistory() {
+            const modelName = selectedModel === 'preeclampsia' ? 'Pre-eclampsia' : 'Diabetes';
+            
+            if (confirm(`Are you sure you want to clear all chat history for the ${modelName} model? This action cannot be undone.`)) {
+                // Clear current model's history
+                modelChatHistory[selectedModel] = [];
+                localStorage.setItem('healthmama_model_chat_history', JSON.stringify(modelChatHistory));
+                
+                // Start new chat
+                newChat();
+            }
+            
+            // Close mobile menu if open
+            document.getElementById('mobileMenuDropdown').classList.remove('active');
+        }
     </script>
 </body>
 </html>
