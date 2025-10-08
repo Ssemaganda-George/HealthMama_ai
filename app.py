@@ -66,7 +66,10 @@ def generate_response_with_openai(conversation_history, model='diabetes'):
         api_key = os.getenv('OPENAI_API_KEY')
         if not api_key:
             return "Error: OpenAI API key not configured"
-            
+        
+        # Clean the API key of any extra whitespace or characters
+        api_key = api_key.strip().replace('\t', '').replace('\n', '').replace('\r', '')
+        
         openai.api_key = api_key
         
         if model == 'preeclampsia':
@@ -136,6 +139,70 @@ def test_endpoint():
             'preeclampsia_loaded': len(preeclampsia_data) > 0
         }
     }), 200
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    """Legacy endpoint that matches the frontend - converts FormData to JSON format"""
+    try:
+        # Handle FormData from frontend
+        if request.form:
+            user_message = request.form.get('query', '').strip()
+            model = request.form.get('model', 'diabetes')
+        elif request.is_json:
+            data = request.get_json()
+            user_message = data.get('message', '').strip()
+            model = data.get('model', 'diabetes')
+        else:
+            return jsonify({'error': 'No data received', 'response': 'Please provide valid data.'}), 400
+            
+        if not user_message:
+            return jsonify({
+                'response': 'Please provide a message.', 
+                'conversation_history': conversation_history_dict.get(model, []), 
+                'audio_url': None
+            })
+
+        # Get relevant context using simple keyword matching
+        if model == 'preeclampsia' and preeclampsia_data:
+            context = retrieve_context_simple(user_message, preeclampsia_data)
+        elif model == 'diabetes' and diabetes_data:
+            context = retrieve_context_simple(user_message, diabetes_data)
+        else:
+            context = []
+
+        # Add context to the conversation
+        context_text = "\n".join(context[:3]) if context else "No specific context available."
+        
+        # Add user message to conversation history
+        conversation_history_dict[model].append({"role": "user", "content": user_message})
+        
+        # Add context as system message
+        if context:
+            conversation_history_dict[model].append({"role": "system", "content": f"Relevant context: {context_text}"})
+
+        # Keep conversation history manageable
+        if len(conversation_history_dict[model]) > 10:
+            conversation_history_dict[model] = conversation_history_dict[model][-8:]
+
+        response = generate_response_with_openai(conversation_history_dict[model], model)
+        
+        # Add AI response to conversation history
+        conversation_history_dict[model].append({"role": "assistant", "content": response})
+
+        return jsonify({
+            'response': response, 
+            'conversation_history': conversation_history_dict[model], 
+            'audio_url': None
+        })
+        
+    except Exception as e:
+        print(f"Error in ask endpoint: {str(e)}")
+        return jsonify({
+            'error': f'Ask error: {str(e)}',
+            'response': 'Sorry, I encountered an error processing your request.',
+            'conversation_history': conversation_history_dict.get(model if 'model' in locals() else 'diabetes', []),
+            'audio_url': None
+        }), 500
 
 @app.route('/chat', methods=['POST'])
 def chat():
