@@ -25,18 +25,160 @@ def load_cleaned_data(file_path):
 
 # Simplified context retrieval using keyword matching instead of embeddings
 def retrieve_context_simple(query, data, top_n=5):
-    """Simple keyword-based context retrieval"""
+    """Simple keyword-based context retrieval with better matching for different languages"""
     query_words = query.lower().split()
     scored_data = []
     
+    # Multilingual health term mappings
+    multilingual_terms = {
+        # Luganda terms
+        'ssukali': ['diabetes', 'sugar', 'blood sugar'],
+        'musujja': ['diabetes', 'sugar'],
+        'omusujja': ['diabetes', 'sugar'],
+        'omusayi': ['blood', 'pressure'],
+        'omutwe': ['head', 'headache'],
+        'olumbe': ['disease', 'illness'],
+        'obulwadde': ['disease', 'illness', 'condition'],
+        'okujjukira': ['remember', 'memory'],
+        'endya': ['food', 'eat', 'diet'],
+        'emmere': ['food', 'meal', 'diet'],
+        'amabeere': ['milk', 'dairy'],
+        'ebijjanjalo': ['vegetables'],
+        'ebibala': ['fruits'],
+        'amazzi': ['water'],
+        'okutambula': ['walk', 'exercise'],
+        'okukola': ['work', 'exercise'],
+        
+        # Swahili terms
+        'sukari': ['diabetes', 'sugar', 'blood sugar'],
+        'ugonjwa': ['disease', 'illness', 'condition'],
+        'damu': ['blood', 'pressure'],
+        'kichwa': ['head', 'headache'],
+        'chakula': ['food', 'meal', 'diet'],
+        'maziwa': ['milk', 'dairy'],
+        'mboga': ['vegetables'],
+        'matunda': ['fruits'],
+        'maji': ['water'],
+        'kutembea': ['walk', 'exercise'],
+        'kufanya': ['work', 'exercise'],
+        'mama': ['mother', 'pregnancy'],
+        'mtoto': ['child', 'baby'],
+        
+        # French terms
+        'diabète': ['diabetes', 'sugar', 'blood sugar'],
+        'sucre': ['sugar', 'blood sugar'],
+        'maladie': ['disease', 'illness', 'condition'],
+        'sang': ['blood', 'pressure'],
+        'tête': ['head', 'headache'],
+        'nourriture': ['food', 'meal', 'diet'],
+        'lait': ['milk', 'dairy'],
+        'légumes': ['vegetables'],
+        'fruits': ['fruits'],
+        'eau': ['water'],
+        'marcher': ['walk', 'exercise'],
+        'mère': ['mother', 'pregnancy'],
+        'enfant': ['child', 'baby'],
+        
+        # Arabic terms
+        'سكري': ['diabetes', 'sugar', 'blood sugar'],
+        'سكر': ['sugar', 'blood sugar'],
+        'مرض': ['disease', 'illness', 'condition'],
+        'دم': ['blood', 'pressure'],
+        'رأس': ['head', 'headache'],
+        'طعام': ['food', 'meal', 'diet'],
+        'حليب': ['milk', 'dairy'],
+        'خضار': ['vegetables'],
+        'فواكه': ['fruits'],
+        'ماء': ['water'],
+        'مشي': ['walk', 'exercise'],
+        'أم': ['mother', 'pregnancy'],
+        'طفل': ['child', 'baby'],
+        
+        # Spanish terms
+        'azúcar': ['diabetes', 'sugar', 'blood sugar'],
+        'enfermedad': ['disease', 'illness', 'condition'],
+        'sangre': ['blood', 'pressure'],
+        'cabeza': ['head', 'headache'],
+        'comida': ['food', 'meal', 'diet'],
+        'leche': ['milk', 'dairy'],
+        'verduras': ['vegetables'],
+        'frutas': ['fruits'],
+        'agua': ['water'],
+        'caminar': ['walk', 'exercise'],
+        'madre': ['mother', 'pregnancy'],
+        'niño': ['child', 'baby']
+    }
+    
+    # Expand query with related terms from multiple languages
+    expanded_query = set(query_words)
+    for word in query_words:
+        if word in multilingual_terms:
+            expanded_query.update(multilingual_terms[word])
+    
+    expanded_query = list(expanded_query)
+    
     for idx, text in enumerate(data):
-        score = sum(1 for word in query_words if word in text.lower())
+        text_lower = text.lower()
+        score = sum(1 for word in expanded_query if word in text_lower)
         if score > 0:
             scored_data.append((score, idx, text))
     
     # Sort by score and return top results
     scored_data.sort(reverse=True)
     return [text for _, _, text in scored_data[:top_n]]
+
+def detect_language_and_add_cultural_context(user_message, conversation_history, model):
+    """Detect various languages and add specific cultural context for better responses"""
+    
+    # Language detection patterns
+    language_patterns = {
+        'luganda': {
+            'indicators': ['nga', 'bwe', 'ku', 'mu', 'nti', 'kiki', 'ani', 'wa', 'gw', 'ly', 'gy', 'ssukali', 'omusujja', 'obulwadde', 'emmere', 'amazzi', 'otya', 'oli', 'nkwagala'],
+            'cultural_context': "The user is asking in Luganda. Please respond in clear, detailed Luganda using simple terms. Include practical advice relevant to Ugandan context. Use common Luganda health vocabulary and explain medical terms clearly. Give specific examples with local foods like matooke, posho, beans, cassava when discussing diet. Consider traditional Ugandan healthcare practices."
+        },
+        'swahili': {
+            'indicators': ['habari', 'hujambo', 'asante', 'karibu', 'chakula', 'maji', 'dawa', 'ugonjwa', 'afya', 'daktari', 'hospitali', 'sukari', 'damu', 'mzazi', 'mama', 'mtoto'],
+            'cultural_context': "The user is asking in Swahili. Please respond in clear, detailed Swahili using simple terms. Include practical advice relevant to East African context. Use common Swahili health vocabulary and explain medical terms clearly. Give examples with local foods like ugali, rice, beans, vegetables commonly found in East Africa."
+        },
+        'french': {
+            'indicators': ['bonjour', 'salut', 'merci', 'comment', 'allez', 'vous', 'santé', 'maladie', 'médecin', 'hôpital', 'diabète', 'sucre', 'sang', 'grossesse', 'mère', 'enfant', 'nourriture'],
+            'cultural_context': "The user is asking in French. Please respond in clear, detailed French using simple terms. Include practical advice relevant to French-speaking African context. Use common French health vocabulary and explain medical terms clearly. Consider local dietary habits and healthcare practices in French-speaking regions."
+        },
+        'arabic': {
+            'indicators': ['السلام', 'أهلا', 'مرحبا', 'شكرا', 'صحة', 'مرض', 'طبيب', 'مستشفى', 'سكري', 'دم', 'حمل', 'أم', 'طفل', 'طعام', 'ماء'],
+            'cultural_context': "The user is asking in Arabic. Please respond in clear, detailed Arabic using simple terms. Include practical advice relevant to Arabic-speaking context. Use common Arabic health vocabulary and explain medical terms clearly. Consider cultural dietary practices and healthcare traditions in Arabic-speaking communities."
+        },
+        'spanish': {
+            'indicators': ['hola', 'gracias', 'cómo', 'está', 'salud', 'enfermedad', 'doctor', 'hospital', 'diabetes', 'azúcar', 'sangre', 'embarazo', 'madre', 'niño', 'comida'],
+            'cultural_context': "The user is asking in Spanish. Please respond in clear, detailed Spanish using simple terms. Include practical advice relevant to Spanish-speaking context. Use common Spanish health vocabulary and explain medical terms clearly. Consider local dietary habits and healthcare practices."
+        },
+        'portuguese': {
+            'indicators': ['olá', 'obrigado', 'como', 'está', 'saúde', 'doença', 'médico', 'hospital', 'diabetes', 'açúcar', 'sangue', 'gravidez', 'mãe', 'criança', 'comida'],
+            'cultural_context': "The user is asking in Portuguese. Please respond in clear, detailed Portuguese using simple terms. Include practical advice relevant to Portuguese-speaking African context. Use common Portuguese health vocabulary and explain medical terms clearly."
+        },
+        'amharic': {
+            'indicators': ['ሰላም', 'አመሰግናለሁ', 'እንዴት', 'ጤና', 'በሽታ', 'ሐኪም', 'ሆስፒታል', 'ስኳር', 'ደም', 'እርግዝና', 'እናት', 'ልጅ', 'ምግብ'],
+            'cultural_context': "The user is asking in Amharic. Please respond in clear, detailed Amharic using simple terms. Include practical advice relevant to Ethiopian context. Use common Amharic health vocabulary and explain medical terms clearly. Consider traditional Ethiopian dietary practices and healthcare."
+        }
+    }
+    
+    # Detect language
+    detected_language = None
+    user_message_lower = user_message.lower()
+    
+    for language, patterns in language_patterns.items():
+        if any(indicator in user_message_lower for indicator in patterns['indicators']):
+            detected_language = language
+            break
+    
+    # Add cultural context if language detected
+    if detected_language:
+        conversation_history.append({
+            "role": "system", 
+            "content": language_patterns[detected_language]['cultural_context']
+        })
+    
+    return conversation_history
 
 # Initialize conversation history
 conversation_history_dict = {
@@ -75,14 +217,25 @@ def generate_response_with_openai(conversation_history, model='diabetes'):
         if model == 'preeclampsia':
             system_prompt = (
                 "You are a helpful assistant specialized in health information, with a focus on preeclampsia and maternal health. "
-                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
+                "CRITICAL: Always respond in the EXACT same language as the user's question. Automatically detect the user's language and reply in that language. "
+                "Support multiple languages including English, Luganda, Swahili, French, Arabic, Spanish, Portuguese, Amharic, and others. "
+                "When responding in local languages, provide detailed, culturally appropriate responses using simple, clear terms. "
+                "Include practical advice that is relevant to the local healthcare context and cultural practices. "
+                "Use common local health terms and explain medical concepts in ways that are easily understood. "
+                "For African contexts, consider traditional practices, local foods, and healthcare accessibility. "
                 "Provide accurate, concise, and informative responses based on the given context. "
                 "If the question is not related to health or preeclampsia, politely inform the user that you can only provide information on health and preeclampsia."
             )
         else:  # diabetes
             system_prompt = (
                 "You are a helpful assistant specialized in health information, with a focus on diabetes and blood sugar management. "
-                "Always respond in the same language as the user's question. Detect the user's language and reply in that language. "
+                "CRITICAL: Always respond in the EXACT same language as the user's question. Automatically detect the user's language and reply in that language. "
+                "Support multiple languages including English, Luganda, Swahili, French, Arabic, Spanish, Portuguese, Amharic, and others. "
+                "When responding in local languages, provide detailed, culturally appropriate responses using simple, clear terms. "
+                "Include practical advice about diet, exercise, and diabetes management that is relevant to local lifestyle and available foods. "
+                "Use common local health terms and explain medical concepts in ways that are easily understood. "
+                "For African contexts, mention local foods like matooke, posho, ugali, cassava, beans, and their effects on blood sugar when relevant. "
+                "Consider traditional practices, cultural dietary habits, and healthcare accessibility in your responses. "
                 "Provide accurate, concise, and informative responses based on the given context. "
                 "If the question is not related to health or diabetes, politely inform the user that you can only provide information on health and diabetes."
             )
@@ -179,6 +332,11 @@ def ask():
         # Add user message to conversation history
         conversation_history_dict[model].append({"role": "user", "content": user_message})
         
+        # Add language-specific cultural context  
+        conversation_history_dict[model] = detect_language_and_add_cultural_context(
+            user_message, conversation_history_dict[model], model
+        )
+        
         # Add context as system message
         if context:
             conversation_history_dict[model].append({"role": "system", "content": f"Relevant context: {context_text}"})
@@ -243,6 +401,11 @@ def chat():
         
         # Add user message to conversation history
         conversation_history_dict[model].append({"role": "user", "content": user_message})
+        
+        # Add language-specific cultural context
+        conversation_history_dict[model] = detect_language_and_add_cultural_context(
+            user_message, conversation_history_dict[model], model
+        )
         
         # Add context as system message
         if context:
