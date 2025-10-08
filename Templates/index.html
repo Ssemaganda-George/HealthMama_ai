@@ -121,18 +121,37 @@
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 2rem;
-            max-width: min(90vw, 600px);
+            max-width: min(90vw, 500px);
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
+            text-align: center;
         }
 
         .privacy-content h2 {
             color: var(--color-primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .privacy-summary {
+            color: var(--color-text);
+            line-height: 1.6;
             margin-bottom: 1.5rem;
-            text-align: center;
-            font-size: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .privacy-details {
+            display: none;
+            text-align: left;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .privacy-details.show {
+            display: block;
         }
 
         .privacy-content p {
@@ -160,7 +179,7 @@
             flex-wrap: wrap;
         }
 
-        .privacy-accept, .privacy-decline {
+        .privacy-accept, .privacy-decline, .view-details-btn {
             padding: 12px 24px;
             border: none;
             border-radius: 8px;
@@ -189,6 +208,21 @@
         .privacy-decline:hover {
             background: var(--danger-hover);
             transform: translateY(-2px);
+        }
+
+        .view-details-btn {
+            background: transparent;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            min-width: auto;
+        }
+
+        .view-details-btn:hover {
+            background: var(--color-primary);
+            color: white;
+            transform: translateY(-1px);
         }
 
         /* Dark Mode Toggle */
@@ -860,40 +894,54 @@
     <!-- Privacy Policy Modal -->
     <div class="privacy-modal" id="privacyModal">
         <div class="privacy-content">
-            <h2>Privacy Policy & Terms of Use</h2>
-            <p><strong>HealthMama AI</strong> is designed to provide health information and support. Please read and accept our terms before using the service.</p>
+            <h2>Welcome to HealthMama AI</h2>
             
-            <h3>Data Collection & Privacy</h3>
-            <ul>
-                <li>We collect and store your chat conversations locally in your browser</li>
-                <li>No personal health data is transmitted to external servers beyond OpenAI's API</li>
-                <li>Your conversations are used solely to provide AI responses through OpenAI's services</li>
-                <li>We do not sell, share, or distribute your personal information</li>
-                <li>You can clear your chat history at any time</li>
-            </ul>
+            <div class="privacy-summary">
+                <p>🏥 <strong>Medical AI Assistant</strong> for pregnancy and health information</p>
+                <p>💭 Your conversations stay private and are stored locally in your browser</p>
+                <p>⚠️ <strong>Important:</strong> This is for informational purposes only - not a substitute for professional medical advice</p>
+                <p>🔒 We respect your privacy and don't share your personal information</p>
+            </div>
 
-            <h3>Medical Disclaimer</h3>
-            <ul>
-                <li>This AI assistant provides general health information only</li>
-                <li>It is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
-                <li>Always consult qualified healthcare providers for medical concerns</li>
-                <li>In case of medical emergencies, contact emergency services immediately</li>
-                <li>Do not rely solely on AI advice for health decisions</li>
-            </ul>
+            <button class="view-details-btn" onclick="togglePrivacyDetails()" id="viewDetailsBtn">
+                📋 View Full Terms & Privacy Policy
+            </button>
 
-            <h3>Usage Terms</h3>
-            <ul>
-                <li>Use this service responsibly and for lawful purposes only</li>
-                <li>Do not share sensitive personal information in chats</li>
-                <li>The service is provided "as is" without warranties</li>
-                <li>We reserve the right to modify or discontinue the service</li>
-            </ul>
+            <div class="privacy-details" id="privacyDetails">
+                <h3>Data Collection & Privacy</h3>
+                <ul>
+                    <li>We collect and store your chat conversations locally in your browser</li>
+                    <li>No personal health data is transmitted to external servers beyond OpenAI's API</li>
+                    <li>Your conversations are used solely to provide AI responses through OpenAI's services</li>
+                    <li>We do not sell, share, or distribute your personal information</li>
+                    <li>You can clear your chat history at any time</li>
+                </ul>
 
-            <p><strong>By clicking "Accept", you acknowledge that you have read, understood, and agree to these terms.</strong></p>
+                <h3>Medical Disclaimer</h3>
+                <ul>
+                    <li>This AI assistant provides general health information only</li>
+                    <li>It is NOT a substitute for professional medical advice, diagnosis, or treatment</li>
+                    <li>Always consult qualified healthcare providers for medical concerns</li>
+                    <li>In case of medical emergencies, contact emergency services immediately</li>
+                    <li>Do not rely solely on AI advice for health decisions</li>
+                </ul>
+
+                <h3>Usage Terms</h3>
+                <ul>
+                    <li>Use this service responsibly and for lawful purposes only</li>
+                    <li>Do not share sensitive personal information in chats</li>
+                    <li>The service is provided "as is" without warranties</li>
+                    <li>We reserve the right to modify or discontinue the service</li>
+                </ul>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--color-text-light); margin: 1.5rem 0 0.5rem;">
+                By continuing, you acknowledge that you understand this is an AI assistant for informational purposes only.
+            </p>
 
             <div class="privacy-buttons">
-                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">Accept & Continue</button>
-                <button class="privacy-decline" onclick="declinePrivacyPolicy()">Decline</button>
+                <button class="privacy-accept" onclick="acceptPrivacyPolicy()">✅ I Understand - Continue</button>
+                <button class="privacy-decline" onclick="declinePrivacyPolicy()">❌ No Thanks</button>
             </div>
         </div>
     </div>
@@ -992,6 +1040,19 @@
         function declinePrivacyPolicy() {
             alert('You must accept the privacy policy to use HealthMama AI. The page will now close.');
             window.close();
+        }
+
+        function togglePrivacyDetails() {
+            const details = document.getElementById('privacyDetails');
+            const btn = document.getElementById('viewDetailsBtn');
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                btn.textContent = '📋 View Full Terms & Privacy Policy';
+            } else {
+                details.classList.add('show');
+                btn.textContent = '📖 Hide Details';
+            }
         }
 
         // Dark Mode Management
