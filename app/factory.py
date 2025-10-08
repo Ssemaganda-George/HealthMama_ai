@@ -18,7 +18,7 @@ def create_app(config_name=None):
     
     # Create Flask app
     app = Flask(__name__, 
-                template_folder='../templates',
+                template_folder='../Templates',
                 static_folder='../static')
     
     # Load configuration
