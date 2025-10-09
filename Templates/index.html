@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthMama AI - Your Trusted Health Companion</title>
+    <title>HealthMaMa AI - Your Trusted Health Companion</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -45,6 +45,11 @@
             box-sizing: border-box;
         }
 
+        html {
+            height: 100%;
+            width: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -52,7 +57,10 @@
             line-height: 1.6;
             transition: var(--transition);
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         [data-theme="dark"] body {
@@ -60,18 +68,21 @@
         }
 
         /* Single Page Layout Optimization */
+               /* Single Page Layout Optimization */
         #mainApp {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: auto;
+            width: 100vw;
+            overflow: hidden;
         }
 
         #mainApp main {
             flex: 1;
-            overflow: auto;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            height: calc(100vh - 70px);
         }
 
         /* Header Styles */
@@ -317,18 +328,19 @@
 
         /* Main Content */
         .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            height: 100vh;
+            margin: 0;
             padding: 1rem;
-            min-height: calc(100vh - 120px);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .welcome-section {
             text-align: center;
-            margin-bottom: 1rem;
-            padding: 1.5rem;
+            margin-bottom: 0.75rem;
+            padding: 1rem;
             background: rgba(255,255,255,0.95);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -336,6 +348,7 @@
             border: 1px solid rgba(255,255,255,0.2);
             width: 100%;
             min-height: auto;
+            flex-shrink: 0;
         }
 
         .welcome-section h2 {
@@ -499,9 +512,10 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 200px);
+            height: 100%;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
         }
 
         .chat-messages {
@@ -512,6 +526,7 @@
             border-radius: var(--border-radius);
             margin-bottom: 0.75rem;
             min-height: 200px;
+            max-height: none;
             border: 1px solid var(--border-color);
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
         }
@@ -1050,6 +1065,31 @@
         }
 
         /* Responsive Design */
+        /* Desktop and large screen optimizations */
+        @media (min-width: 1024px) {
+            .main-container {
+                padding: 1.5rem;
+            }
+            
+            .chat-container {
+                padding: 1rem;
+            }
+            
+            .welcome-section {
+                padding: 1.25rem;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .main-container {
+                padding: 2rem;
+            }
+            
+            .chat-container {
+                padding: 1.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
                 padding: 0.5rem 0;
@@ -1476,7 +1516,7 @@
             if (selectedModel === 'preeclampsia') {
                 welcomeMessage = `
                     <div class="message assistant">
-                        <i class="fas fa-baby"></i> Welcome to HealthMama AI - Pre-eclampsia Support! 
+                        <i class="fas fa-baby"></i> Welcome to HealthMaMa AI - Pre-eclampsia Support! 
                         <br><br>I'm specialized in providing information about pre-eclampsia, maternal health, and pregnancy complications. 
                         I can help you understand symptoms, management, and care recommendations. 
                         <br><br>How can I assist you with your maternal health journey today?
@@ -1485,7 +1525,7 @@
             } else {
                 welcomeMessage = `
                     <div class="message assistant">
-                        <i class="fas fa-stethoscope"></i> Welcome to HealthMama AI - Diabetes Support! 
+                        <i class="fas fa-stethoscope"></i> Welcome to HealthMaMa AI - Diabetes Support! 
                         <br><br>I'm specialized in providing information about gestational diabetes, blood sugar management, and diabetes care during pregnancy. 
                         I can help with diet recommendations, monitoring guidance, and general diabetes health support.
                         <br><br>How can I assist you with your diabetes management today?
@@ -1811,25 +1851,100 @@
             });
         }
 
-        // Language detection function
+        // Enhanced Language detection function with comprehensive Luganda support
         function detectLanguage(text) {
             if (!text) return 'en';
             
-            // Simple language detection based on common words and patterns
-            const lugandaWords = ['nze', 'gwe', 'ye', 'oli', 'buli', 'bw\'oli', 'nga', 'ku', 'wa', 'ba', 'mu', 'omuntu', 'abantu', 'omukazi', 'omusajja', 'omwana', 'omubiri', 'obulwadde', 'amazzi', 'emmere', 'ddagala', 'amaanyi', 'obuyinza', 'okugenda', 'okuva', 'okujja', 'okukola', 'okutegeera', 'okusoma', 'okuwandika', 'webale', 'weebale', 'mzungu', 'munnamwandu', 'ssebo', 'nyabo', 'ki', 'anti', 'nti', 'sirina', 'nina', 'tukooye', 'simanyi', 'ndi', 'nga bw\'oli', 'kino', 'kiti', 'bulabe', 'obuwuka', 'amazzi g\'omubiri', 'bulunji', 'bulungi', 'gyendi', 'wano', 'eyo', 'eri', 'ssukali', 'omusujja'];
+            // Comprehensive Luganda vocabulary including medical terms, grammar patterns, and common phrases
+            const lugandaWords = [
+                // Basic pronouns and verbs
+                'nze', 'gwe', 'ye', 'oli', 'buli', 'bw\'oli', 'nga', 'ku', 'wa', 'ba', 'mu', 'ndi', 'tuli', 'muli', 'bali',
+                
+                // Medical and health terms
+                'ssukali', 'omusujja', 'obulwadde', 'ddagala', 'eddwaliro', 'omusawo', 'omusayi', 'omutwe', 'omubiri',
+                'amaaso', 'amatu', 'amazzi', 'emmere', 'okugula', 'okukwata', 'okufa', 'obulamu', 'ebyobulamu',
+                'eddoboozi', 'okusonyiwa', 'okukoona', 'okufuuwa', 'okuwulira', 'okutambula', 'okujjukira',
+                
+                // Pregnancy and maternal health
+                'omwana', 'olubuto', 'okuzaala', 'okunywa', 'omukozi', 'embuto', 'okufuna', 'okukuza', 'okulabirira',
+                'omukazi', 'omusajja', 'okwekulaakulana', 'okweyongera', 'okukendeeza', 'okutumbula',
+                
+                // Common question words and patterns
+                'ki', 'ani', 'wa', 'anti', 'nti', 'nga', 'bwoba', 'lwaki', 'otya', 'gye', 'lwa', 'ku', 'mu', 'eri',
+                
+                // Greetings and social phrases
+                'bulunji', 'bulungi', 'bulijjo', 'webale', 'weebale', 'mzungu', 'ssebo', 'nyabo', 'mukwano',
+                'munnamukama', 'munnamwandu', 'kino', 'kiti', 'wano', 'eyo', 'eri', 'gyendi',
+                
+                // Negative and affirmative expressions
+                'sirina', 'nina', 'tukooye', 'simanyi', 'nmanyi', 'ddala', 'mazima', 'ddala ddala',
+                
+                // Food and nutrition
+                'endya', 'ebyokulya', 'amabeere', 'ebijjanjalo', 'ebibala', 'amafuta', 'ebbugumu', 'emmere',
+                'ebikajjo', 'amakate', 'ebinyebwa', 'emizigo', 'ekyeyo', 'ebijanjaalo',
+                
+                // Body parts and symptoms
+                'omukono', 'okugulu', 'omunda', 'ekitundu', 'ensiko', 'amannyo', 'olulimi', 'ennyindo',
+                'ebweru', 'olugoye', 'engeri', 'obusirike', 'obuzibu', 'okubonesha', 'okukaaba',
+                
+                // Temporal and spatial terms
+                'leero', 'enkya', 'jjo', 'maama', 'taata', 'ggulo', 'makya', 'ttumbi', 'ekiro', 'emisana',
+                
+                // Common verbs and actions
+                'okuva', 'okujja', 'okugenda', 'okukola', 'okutegeera', 'okusoma', 'okuwandika', 'okuyita',
+                'okwogera', 'okuwulira', 'okukyalira', 'okutuula', 'okuyimirira', 'okubaka', 'okukungula',
+                
+                // Question and response patterns
+                'otya', 'tuwa', 'meka', 'nkusaba', 'nkwegayiridde', 'nsanyuse', 'genda', 'jjangu',
+                
+                // Medical conditions specific terms  
+                'okusimba', 'okujjukira', 'okweraliikirira', 'okunywa', 'okukojjagana', 'okusaasaana',
+                'obuwuba', 'obunaku', 'okukaluubirira', 'okutwalira', 'ebintu', 'ebirowoozo'
+            ];
+            
             const swahiliWords = ['mimi', 'wewe', 'yeye', 'una', 'nina', 'hana', 'kwa', 'wa', 'za', 'ya', 'mtu', 'watu', 'mwanamke', 'mwanaume', 'mtoto', 'mwili', 'ugonjwa', 'maji', 'chakula', 'dawa', 'nguvu', 'uwezo', 'kwenda', 'kutoka', 'kuja', 'kufanya', 'kuelewa', 'kusoma', 'kuandika', 'asante', 'mzungu', 'bwana', 'mama', 'nini', 'kwa sababu', 'sina', 'kila', 'hii', 'hiki', 'hatari', 'habari', 'nzuri', 'vizuri'];
             const frenchWords = ['je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'suis', 'es', 'est', 'sommes', 'êtes', 'sont', 'de', 'du', 'des', 'le', 'la', 'les', 'un', 'une', 'homme', 'femme', 'enfant', 'corps', 'maladie', 'eau', 'nourriture', 'médicament', 'force', 'pouvoir', 'aller', 'venir', 'faire', 'comprendre', 'lire', 'écrire', 'merci', 'bonjour', 'bonsoir', 'oui', 'non', 'pourquoi', 'parce que', 'avec', 'sans', 'pour', 'dans', 'sur', 'sous', 'danger', 'comment', 'allez'];
             
             const textLower = text.toLowerCase();
             
-            // Check for exact Luganda phrases first
-            const lugandaPhrases = ['oli bulunji', 'oli bulungi', 'oli otya', 'webale nyo', 'weebale nyo', 'nga bw\'oli', 'ssukali gwange'];
+            // Enhanced Luganda phrase detection with medical and conversational phrases
+            const lugandaPhrases = [
+                'oli bulunji', 'oli bulungi', 'oli otya', 'webale nyo', 'weebale nyo', 'nga bw\'oli', 
+                'ssukali gwange', 'ssukali gw\'oku musayi', 'obulwadde bw\'ssukali', 'ddagala ly\'ssukali',
+                'omwana gw\'eka', 'omwana mu nda', 'omukazi ali mu lubuto', 'okunywa amazzi',
+                'omutwe gunuma', 'omutwe gunkuba', 'omusayi guwede', 'okukaaba kw\'amazzi',
+                'endya ki', 'emmere ki', 'nkwagala nyo', 'nkusaba obuyambi', 'sirina ssukali',
+                'nina ssukali', 'simanyi bulungi', 'ndi mulwadde', 'njagala okumanya',
+                'lwaki ssukali', 'genda eri omusawo', 'okunywa ddagala', 'oli mutuufu'
+            ];
+            
+            // Check for exact Luganda phrases first - these are strong indicators
             if (lugandaPhrases.some(phrase => textLower.includes(phrase))) {
                 return 'lg';
             }
             
+            // Check for Luganda grammatical patterns
+            const lugandaPatterns = [
+                /\bolu?\w+\b/,  // ou- prefix pattern
+                /\baka?\w+\b/,  // aka- prefix pattern  
+                /\beki?\w+\b/,  // eki- prefix pattern
+                /\baba?\w+\b/,  // aba- prefix pattern
+                /\bumu?\w+\b/,  // omu- prefix pattern
+                /\bgw[aeiouy]/,  // gw- sound pattern
+                /\bnk[aeiouy]/,  // nk- sound pattern
+                /\bkw[aeiouy]/,  // kw- sound pattern
+                /nji\b/,        // common ending
+                /nge\b/,        // common ending
+                /'[aeiouy]/     // apostrophe patterns
+            ];
+            
+            let lugandaPatternMatches = 0;
+            lugandaPatterns.forEach(pattern => {
+                if (pattern.test(textLower)) lugandaPatternMatches++;
+            });
+            
             // Check for exact Swahili phrases
-            const swahiliPhrases = ['habari yako', 'hujambo', 'sijambo', 'asante sana', 'karibu sana'];
+            const swahiliPhrases = ['habari yako', 'hujambo', 'sijambo', 'asante sana', 'karibu sana', 'mama mjamzito'];
             if (swahiliPhrases.some(phrase => textLower.includes(phrase))) {
                 return 'sw';
             }
@@ -1840,7 +1955,7 @@
                 return 'fr';
             }
             
-            // Count matches for each language
+            // Count matches for each language with enhanced scoring
             let lugandaCount = 0;
             let swahiliCount = 0;
             let frenchCount = 0;
@@ -1849,17 +1964,20 @@
             const words = textLower.split(/\s+/);
             
             words.forEach(word => {
-                if (lugandaWords.includes(word)) lugandaCount++;
+                if (lugandaWords.includes(word)) lugandaCount += 2; // Higher weight for Luganda
                 if (swahiliWords.includes(word)) swahiliCount++;
                 if (frenchWords.includes(word)) frenchCount++;
             });
             
-            // Require at least 1 match and prefer the language with highest count
+            // Add pattern bonus for Luganda
+            lugandaCount += lugandaPatternMatches * 1.5;
+            
+            // Enhanced decision logic with bias toward Luganda for medical queries
             if (lugandaCount > 0 && lugandaCount >= swahiliCount && lugandaCount >= frenchCount) {
                 return 'lg'; // Luganda
-            } else if (swahiliCount > 0 && swahiliCount > frenchCount) {
+            } else if (swahiliCount > 0 && swahiliCount > frenchCount && swahiliCount > lugandaCount) {
                 return 'sw'; // Swahili
-            } else if (frenchCount > 0) {
+            } else if (frenchCount > 0 && frenchCount > lugandaCount && frenchCount > swahiliCount) {
                 return 'fr'; // French
             } else {
                 return 'en'; // Default to English

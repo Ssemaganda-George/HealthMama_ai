@@ -1,16 +1,145 @@
 """
 OpenAI Service for HealthMama AI
-Handles communication with OpenAI API
-
-LANGUAGE HANDLING:
-- Default language: English for all models and contexts
-- Multi-language support: Responds in user's language only when they explicitly use it
-- Luganda detection: Uses strict criteria to avoid false positives
-- Cross-model responses: Default to English unless strong Luganda indicators are present
+Handles communication with OpenAI API with enhanced multi-language support
 """
 import openai
 import logging
-from typing import List, Dict, Optional
+from typing import Dict, Any, Optional, List
+from config.settings import Config
+
+
+class LugandaMedicalTranslator:
+    """Comprehensive Luganda medical terminology and response system"""
+    
+    @staticmethod
+    def get_luganda_medical_terms():
+        """Simple, everyday Luganda medical terms people actually use"""
+        return {
+            # Basic medical terms - simple and commonly used
+            'diabetes': 'ssukali',
+            'blood_sugar': 'ssukali mu musayi', 
+            'high_blood_sugar': 'ssukali gweyongera',
+            'medication': 'ddagala',
+            'medicine': 'ddagala',
+            
+            # Simple pregnancy terms
+            'pregnancy': 'lubuto',
+            'pregnant': 'mu lubuto',
+            'baby': 'mwana',
+            'birth': 'kuzaala',
+            'mother': 'maama',
+            
+            # Basic body parts
+            'blood': 'musayi',
+            'head': 'mutwe',
+            'eyes': 'maaso',
+            'stomach': 'lubuto', # also used for belly/stomach
+            'body': 'mubiri',
+            
+            # Simple symptoms  
+            'headache': 'mutwe gunuma',
+            'pain': 'bulumi',
+            'tired': 'koowa',
+            'sick': 'mulwadde',
+            
+            # Basic food
+            'food': 'mmere',
+            'water': 'mazzi',
+            'eat': 'lya',
+            
+            # Medical care
+            'doctor': 'musawo',
+            'hospital': 'ddwaliro'
+        }
+    
+    @staticmethod
+    def get_luganda_response_templates():
+        """Simple, natural Luganda response patterns like real conversations"""
+        return {
+            'greeting_response': [
+                "Webale. Oli otya?",
+                "Nkusanyuse. Ndi wano okukuyamba.",
+                "Webale okubuuza."
+            ],
+            
+            'diabetes_simple': [
+                "Ssukali gweyongera guyinza okukuleetera ebizibu.",
+                "Ssukali mu musayi bweyongera si kirungi.",
+                "Kyetaaga okugenda eri omusawo."
+            ],
+            
+            'pregnancy_simple': [
+                "Mu lubuto ssukali guyinza okweyongera.",
+                "Omukazi mu lubuto yeetaaga okulabirirwa bulungi.",
+                "Kyetaaga okugenda eri omusawo mangu."
+            ],
+            
+            'advice_simple': [
+                "Kino kye nkugamba:",
+                "Kiki kyoyagala okukola:",
+                "Obuyambi bwange:"
+            ],
+            
+            'doctor_urgent': [
+                "Genda eri omusawo mangu.",
+                "Kyetaaga okugenda ku ddwaliro.",
+                "Laga omusawo amangu ddala."
+            ],
+            
+            'diet_simple': [
+                "Ku mmere:",
+                "Ebyo bye tolya:",
+                "Ku kulya:"
+            ],
+            
+            'common_closings': [
+                "Kwatira obulungi.",
+                "Labirira omubiri gwo.",
+                "Webale."
+            ]
+        }
+    
+    @staticmethod
+    def format_luganda_response(content_type: str, medical_advice: str, urgency: str = 'normal') -> str:
+        """Format a medical response in proper Luganda with cultural context"""
+        templates = LugandaMedicalTranslator.get_luganda_response_templates()
+        
+        # Select appropriate greeting based on content type
+        if content_type == 'diabetes':
+            intro = templates['diabetes_intro'][0]
+        elif content_type == 'pregnancy':
+            intro = templates['pregnancy_intro'][0]
+        else:
+            intro = templates['greeting_response'][0]
+        
+        # Format the main advice
+        advice_prefix = templates['advice_prefix'][0]
+        
+        # Add urgency if needed
+        urgency_text = ""
+        if urgency == 'high':
+            urgency_text = templates['doctor_recommendation'][0] + "\n\n"
+        
+        # Construct response with proper Luganda structure
+        response = f"{intro}\n\n{advice_prefix}\n{medical_advice}\n\n{urgency_text}"
+        
+        # Add cultural closing
+        response += "Obulamu bwo bukulu nnyo. Kuuma omubiri gwo obulungi."
+        
+        return response
+
+
+class OpenAIService:
+    """Enhanced OpenAI service with comprehensive Luganda support"""
+    
+    def __init__(self):
+        openai.api_key = Config.OPENAI_API_KEY
+        self.logger = logging.getLogger(__name__)
+        self.luganda_translator = LugandaMedicalTranslator()
+        
+        # Conversation history for each model
+        self.diabetes_conversation = []
+        self.preeclampsia_conversation = []
 from config.settings import Config
 
 
@@ -59,7 +188,7 @@ class OpenAIService:
         openai.api_key = Config.OPENAI_API_KEY
     
     def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None, language: str = 'en') -> str:
-        """Generate response using OpenAI API with language preference"""
+        """Generate response using OpenAI API with enhanced language support"""
         try:
             # Check for cross-model queries first
             cross_model_response = self._check_cross_model_query(user_message, model, language)
@@ -80,8 +209,160 @@ class OpenAIService:
             # Get conversation history
             conversation_history = self.conversation_manager.get_conversation(model)
             
-            # Add language-specific instructions
-            conversation_history = self._add_language_instruction(language, conversation_history, model)
+            # Enhanced Luganda processing
+            if language == 'lg':
+                response = self._generate_enhanced_luganda_response(user_message, model, conversation_history)
+            else:
+                # Add language-specific instructions for other languages
+                conversation_history = self._add_language_instruction(language, conversation_history, model)
+                response = self._generate_standard_response(conversation_history)
+            
+            # Add assistant response to conversation
+            self.conversation_manager.add_message(model, "assistant", response)
+            
+            return response
+            
+        except Exception as e:
+            self.logger.error(f"Error generating response: {e}")
+            return self._get_fallback_response(language, model)
+    
+    def _generate_enhanced_luganda_response(self, user_message: str, model: str, conversation_history: List[Dict]) -> str:
+        """Generate enhanced Luganda response with proper medical terminology and cultural context"""
+        try:
+            # Prepare enhanced Luganda system prompt
+            luganda_system_prompt = self._create_luganda_system_prompt(model)
+            
+            # Prepare conversation with enhanced Luganda instructions
+            messages = [
+                {"role": "system", "content": luganda_system_prompt}
+            ]
+            
+            # Add conversation history with Luganda context
+            for message in conversation_history[-6:]:  # Keep last 6 messages for context
+                messages.append(message)
+            
+            # Generate response
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                max_tokens=400,
+                temperature=0.7
+            )
+            
+            raw_response = response.choices[0].message.content.strip()
+            
+            # Post-process the response for better Luganda
+            enhanced_response = self._enhance_luganda_response(raw_response, model, user_message)
+            
+            return enhanced_response
+            
+        except Exception as e:
+            self.logger.error(f"Error generating Luganda response: {e}")
+            return self._get_luganda_fallback(model, user_message)
+    
+    def _create_luganda_system_prompt(self, model: str) -> str:
+        """Create simple, natural Luganda system prompt"""
+        base_prompt = f"""You are a health helper who speaks Luganda naturally. Help people with {model} questions.
+
+LUGANDA SPEAKING RULES:
+- Use simple, everyday Luganda words
+- Talk like a normal Luganda speaker would talk
+- Don't use too many big words
+- Be friendly and helpful
+- Keep answers short and clear
+
+SIMPLE WORDS TO USE:
+- ssukali (sugar/diabetes)
+- musayi (blood)
+- mutwe (head) 
+- mubiri (body)
+- ddagala (medicine)
+- musawo (doctor)
+- ddwaliro (hospital)
+- mmere (food)
+- mazzi (water)
+- lubuto (pregnancy)
+- mwana (baby)
+
+HOW TO TALK:
+1. Say "Webale" or "Oli otya?"
+2. Answer the question simply
+3. Give helpful advice
+4. Say to see a doctor if serious
+5. End nicely like "Kwatira bulungi"
+
+IMPORTANT: 
+- Use normal Luganda, not fancy language
+- Give short, helpful answers
+- Don't make it complicated
+- Be like talking to a friend"""
+
+        if model == 'diabetes':
+            base_prompt += "\n\nYou help with ssukali (diabetes) problems and pregnancy health."
+        else:
+            base_prompt += "\n\nYou help with high blood pressure in pregnancy and mother health."
+            
+        return base_prompt
+    
+    def _enhance_luganda_response(self, raw_response: str, model: str, user_message: str) -> str:
+        """Keep Luganda response simple and natural"""
+        # Only replace the most obvious English words that might slip through
+        simple_replacements = {
+            'diabetes': 'ssukali',
+            'doctor': 'musawo', 
+            'hospital': 'ddwaliro',
+            'medicine': 'ddagala',
+            'pregnancy': 'lubuto',
+            'baby': 'mwana',
+            'food': 'mmere',
+            'water': 'mazzi'
+        }
+        
+        enhanced_response = raw_response
+        for english, luganda in simple_replacements.items():
+            enhanced_response = enhanced_response.replace(english, luganda)
+        
+        # Only add greeting if completely missing
+        if not any(greeting in enhanced_response.lower() for greeting in ['webale', 'oli']):
+            enhanced_response = "Webale. " + enhanced_response
+        
+        # Simple, natural closing
+        if not enhanced_response.endswith(('.', '!', '?')):
+            enhanced_response += "."
+            
+        # Don't add complicated closings - keep it simple
+        return enhanced_response
+    
+    def _get_luganda_fallback(self, model: str, user_message: str) -> str:
+        """Simple fallback responses in natural Luganda"""
+        if 'bulunji' in user_message.lower() or 'bulungi' in user_message.lower():
+            return "Webale. Ndi bulungi. Gwe oli otya? Njagala okukuyamba ku ssukali. Kiki kyoyagala okumanya?"
+        
+        if model == 'diabetes':
+            return "Nkusonyiwa. Ku ssukali, genda eri musawo amangu. Webale."
+        else:
+            return "Nkusonyiwa. Ku nsonga z'omukazi mu lubuto, genda eri musawo. Webale."
+    
+    def _generate_standard_response(self, conversation_history: List[Dict]) -> str:
+        """Generate standard response for non-Luganda languages"""
+        try:
+            # Prepare messages for OpenAI
+            messages = [{"role": "system", "content": self._get_system_prompt("diabetes")}] + conversation_history
+            
+            # Generate response using OpenAI
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7
+            )
+            
+            ai_response = response.choices[0].message.content.strip()
+            return ai_response
+            
+        except Exception as e:
+            self.logger.error(f"Error in standard response generation: {e}")
+            return "I apologize, but I'm experiencing technical difficulties. Please try again or consult with a healthcare provider."
             
             # Prepare messages for OpenAI
             messages = [{"role": "system", "content": self._get_system_prompt(model)}] + conversation_history

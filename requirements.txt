@@ -16,6 +16,7 @@ requests==2.32.3
 
 # Data processing
 numpy==2.2.5
+scikit-learn>=1.6.0
 
 # Development and testing (optional in production)
 pytest==8.3.3
