@@ -17,4 +17,5 @@ application = create_app()
 app = application
 
 if __name__ == "__main__":
-    application.run()
+    # local debug fallback
+    application.run(host="0.0.0.0", port=int(__import__("os").environ.get("PORT", 5000)))

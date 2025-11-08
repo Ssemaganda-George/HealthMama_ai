@@ -1,0 +1,12 @@
+# This file intentionally left as a comment to avoid editor schema validation errors.
+# Deploy using the Render Dashboard (recommended):
+# 1. Create a new Web Service → Connect your Git provider → Choose this repository and branch.
+# 2. Build command: pip install -r requirements.txt
+# 3. Start command: gunicorn --bind 0.0.0.0:$PORT wsgi:application
+# 4. Add secrets in Render Dashboard (Environment):
+#    - OPENAI_API_KEY (secret)
+#    - FLASK_SECRET_KEY (secret)
+#    - FLASK_ENV = production
+#
+# If you want to use a render.yaml manifest, generate it from Render's dashboard/CLI
+# or follow Render's official Blueprints documentation and do NOT include secrets.

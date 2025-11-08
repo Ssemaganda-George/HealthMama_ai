@@ -193,6 +193,107 @@ export FLASK_ENV=production
 gunicorn --bind 0.0.0.0:8000 wsgi:application
 ```
 
+## Deploying to Render (concrete steps)
+
+1. Prepare repo (already done)
+   - Ensure `requirements.txt` exists and lists dependencies.
+   - Ensure `Procfile` is present: `web: gunicorn --bind 0.0.0.0:$PORT wsgi:application`
+   - Ensure `wsgi.py` exposes `application` (done).
+
+2. Create Web Service on Render (Dashboard)
+   - Visit https://dashboard.render.com → New → Web Service.
+   - Connect your Git provider and select this repository & branch (e.g., main).
+   - Environment: Python.
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn --bind 0.0.0.0:$PORT wsgi:application`
+   - Instance type / Plan: Starter (or your preferred plan).
+   - Health Check Path: `/health` (optional but recommended).
+
+3. Set Environment Variables (Render Dashboard → Environment)
+   - Required (mark as secret):
+     - OPENAI_API_KEY = <your_openai_api_key>
+     - FLASK_SECRET_KEY = <random-secret>
+   - Recommended:
+     - FLASK_ENV = production
+   - Note: Do NOT commit these values to your repository.
+
+4. Deploy & Monitor
+   - Click "Create Web Service" / "Manual Deploy".
+   - Open the deploy logs in Render to watch build and startup.
+   - If the process fails, check for missing environment variables or dependency errors.
+
+5. Verify endpoints
+   - GET https://<your-service>.onrender.com/health
+   - GET https://<your-service>.onrender.com/status
+
+6. Troubleshooting checklist
+   - "OPENAI_API_KEY environment variable is required" on startup → add the secret in Render and redeploy.
+   - Import errors or missing packages → confirm `requirements.txt` includes the package and correct versions.
+   - Template/static path issues → factory.py sets template_folder and static_folder; verify relative paths if serving fails.
+
+7. Optional: Render CLI / manifest
+   - If you prefer infra-as-code, generate a manifest from Render's dashboard or use the Render CLI to export a valid blueprint. Do not store secrets in the manifest.
+
+## Interactive Render Dashboard Walkthrough (step-by-step)
+
+1. Log in
+   - Open https://dashboard.render.com and sign in with your GitHub account.
+
+2. Create a new Web Service
+   - Click "New" → "Web Service".
+   - Click "Connect a repository" → choose GitHub and authorize if needed.
+   - Select repository: choose `HealthMama_ai` (or the repo that contains this project).
+   - Branch: select `main` (or the branch you want to deploy).
+   - Click "Next".
+
+3. Configure service basics
+   - Name: keep default (e.g., `healthmama-ai`) or enter a name.
+   - Environment: choose "Python".
+   - Region: choose nearest region.
+   - Instance Type / Plan: select "Free Starter" or your preferred plan.
+   - Click "Next".
+
+4. Build & Start commands
+   - Build Command: paste `pip install -r requirements.txt`
+   - Start Command: paste `gunicorn --bind 0.0.0.0:$PORT wsgi:application`
+   - Health Check Path (optional): `/health`
+   - Click "Create Web Service" (or "Next" then "Create").
+
+5. Add environment variables (required)
+   - After service creation, go to the service → "Environment" tab.
+   - Add the following (mark secrets where indicated):
+     - Key: `OPENAI_API_KEY` — Value: your OpenAI API key (Secret)
+     - Key: `FLASK_SECRET_KEY` — Value: a random secret string (Secret)
+     - Key: `FLASK_ENV` — Value: `production`
+   - Save changes.
+
+6. Deploy
+   - If deployment did not start automatically, click "Manual Deploy" → "Deploy latest commit".
+   - Watch the "Deploys" logs in real time.
+
+7. What to watch for in logs
+   - Successful build: lines showing "Installing collected packages" and "Successfully installed".
+   - Gunicorn start: logs showing "Booting worker" or "Listening at: http://0.0.0.0:<port>".
+   - Common failure: `ValueError: OPENAI_API_KEY environment variable is required` → add the `OPENAI_API_KEY` secret and redeploy.
+
+8. Verify service
+   - Open the service URL shown by Render.
+   - Check endpoints:
+     - `GET https://<your-service>.onrender.com/health`
+     - `GET https://<your-service>.onrender.com/status`
+   - If endpoints return JSON with "status": "healthy" or "running", deployment succeeded.
+
+9. Redeploy & rollbacks
+   - Any git push to the connected branch triggers a new deploy.
+   - Use "Manual Deploy" to deploy a specific branch/commit.
+   - Use the "History" or "Deploys" tab to rollback or re-deploy a previous commit.
+
+10. Troubleshooting quick tips
+   - Missing dependency import errors: ensure package is declared in `requirements.txt`.
+   - Template/static path errors: confirm `app.factory` uses the correct relative template/static paths.
+   - If audio/image upload endpoints fail: check request size limits and logs for stack traces.
+   - Paste failing log lines here and I will provide exact fixes.
+
 ## 🔒 Security Features
 
 - **Input Validation**: Comprehensive validation for all user inputs
