@@ -106,19 +106,19 @@ class LugandaMedicalTranslator:
         
         # Select appropriate greeting based on content type
         if content_type == 'diabetes':
-            intro = templates['diabetes_intro'][0]
+            intro = templates['diabetes_simple'][0]
         elif content_type == 'pregnancy':
-            intro = templates['pregnancy_intro'][0]
+            intro = templates['pregnancy_simple'][0]
         else:
             intro = templates['greeting_response'][0]
         
         # Format the main advice
-        advice_prefix = templates['advice_prefix'][0]
+        advice_prefix = templates['advice_simple'][0]
         
         # Add urgency if needed
         urgency_text = ""
         if urgency == 'high':
-            urgency_text = templates['doctor_recommendation'][0] + "\n\n"
+            urgency_text = templates['doctor_urgent'][0] + "\n\n"
         
         # Construct response with proper Luganda structure
         response = f"{intro}\n\n{advice_prefix}\n{medical_advice}\n\n{urgency_text}"
@@ -191,41 +191,24 @@ class OpenAIService:
             # If using new OpenAI client (openai.OpenAI), the OpenAI() constructor below will accept api_key
             pass
 
-    # New compatibility wrapper: attempts new OpenAI client first, falls back to old ChatCompletion API
+    # Use only legacy API for openai==0.28.1
     def _chat_completion(self, messages: List[Dict[str, str]], model: Optional[str] = None,
                          max_tokens: int = 300, temperature: float = 0.7):
         """
-        Cross-version chat completion helper.
-        Tries openai.OpenAI client (openai>=1.0.0) first, falls back to openai.ChatCompletion for older versions.
-        Returns the raw API response object (same structure as each respective SDK).
+        Chat completion helper for openai==0.28.1.
         """
         model_name = model or getattr(Config, "OPENAI_MODEL", "gpt-3.5-turbo")
-        
-        # Try new OpenAI client (openai>=1.0)
         try:
-            from openai import OpenAI
-            client = OpenAI(api_key=Config.OPENAI_API_KEY) if Config.OPENAI_API_KEY else OpenAI()
-            resp = client.chat.completions.create(
+            resp = openai.ChatCompletion.create(
                 model=model_name,
                 messages=messages,
                 max_tokens=max_tokens,
                 temperature=temperature
             )
             return resp
-        except Exception as e_new:
-            # Fallback to older openai.ChatCompletion.create if available
-            try:
-                resp = openai.ChatCompletion.create(
-                    model=model_name,
-                    messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature
-                )
-                return resp
-            except Exception as e_old:
-                # If both fail, log both errors and re-raise the new-client error for clarity
-                self.logger.error(f"New OpenAI client error: {e_new}; Fallback error: {e_old}")
-                raise e_new
+        except Exception as e:
+            self.logger.error(f"OpenAI ChatCompletion error: {e}")
+            raise e
 
     def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None, language: str = 'en') -> str:
         """Generate response using OpenAI API with enhanced language support"""
@@ -567,3 +550,36 @@ class OpenAIService:
     def clear_conversation_history(self, model: str):
         """Clear conversation history for a model"""
         self.conversation_manager.clear_conversation(model)
+    
+    def _create_luganda_system_prompt(self, model: str) -> str:
+        """Create a simple Luganda system prompt for the model."""
+        if model == 'diabetes':
+            return (
+                "Oli musawo ayamba abantu ku nsonga za ssukali (diabetes) n'obulamu bw'abakyala abali mu lubuto. "
+                "Kozaako mu Luganda olusobola okutegeerekeka bulungi. "
+                "Kozesa amagambo agawandiike, era obere muganzi, omuyambi, era osabe abantu okugenda eri omusawo singa kyetaagisa."
+            )
+        else:
+            return (
+                "Oli musawo ayamba abantu ku nsonga za preeclampsia n'obulamu bw'abakyala abali mu lubuto. "
+                "Kozaako mu Luganda olusobola okutegeerekeka bulungi. "
+                "Kozesa amagambo agawandiike, era obere muganzi, omuyambi, era osabe abantu okugenda eri omusawo singa kyetaagisa."
+            )
+
+    def _get_luganda_fallback(self, model: str, user_message: str) -> str:
+        """Fallback Luganda response if OpenAI fails."""
+        if model == 'diabetes':
+            return "Nsonyiwa, waliwo obuzibu mu kufuna obuddamu. Genda eri musawo oba gezako nate."
+        else:
+            return "Nsonyiwa, waliwo obuzibu mu kufuna obuddamu. Genda eri musawo oba gezako nate."
+
+    def _get_fallback_response(self, language: str, model: str) -> str:
+        """Get a fallback response in the specified language"""
+        if language == 'lg':
+            return "Nsonyiwa, waliwo obuzibu mu kufuna obuddamu. Genda eri musawo oba gezako nate."
+        elif language == 'sw':
+            return "Samahani, kuna tatizo katika kupata majibu. Tafadhali tembelea daktari au jaribu tena baadaye."
+        elif language == 'fr':
+            return "Désolé, il y a un problème pour obtenir une réponse. Veuillez consulter un médecin ou réessayer plus tard."
+        else:  # English default
+            return "I'm sorry, there was an error processing your request. Please try again later or consult a healthcare provider."
