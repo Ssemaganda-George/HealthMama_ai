@@ -184,9 +184,49 @@ class OpenAIService:
         self.logger = logging.getLogger(__name__)
         self.conversation_manager = ConversationManager()
         
-        # Set OpenAI API key
-        openai.api_key = Config.OPENAI_API_KEY
-    
+        # Set OpenAI API key for old client compatibility (works with both)
+        try:
+            openai.api_key = Config.OPENAI_API_KEY
+        except Exception:
+            # If using new OpenAI client (openai.OpenAI), the OpenAI() constructor below will accept api_key
+            pass
+
+    # New compatibility wrapper: attempts new OpenAI client first, falls back to old ChatCompletion API
+    def _chat_completion(self, messages: List[Dict[str, str]], model: Optional[str] = None,
+                         max_tokens: int = 300, temperature: float = 0.7):
+        """
+        Cross-version chat completion helper.
+        Tries openai.OpenAI client (openai>=1.0.0) first, falls back to openai.ChatCompletion for older versions.
+        Returns the raw API response object (same structure as each respective SDK).
+        """
+        model_name = model or getattr(Config, "OPENAI_MODEL", "gpt-3.5-turbo")
+        
+        # Try new OpenAI client (openai>=1.0)
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=Config.OPENAI_API_KEY) if Config.OPENAI_API_KEY else OpenAI()
+            resp = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature
+            )
+            return resp
+        except Exception as e_new:
+            # Fallback to older openai.ChatCompletion.create if available
+            try:
+                resp = openai.ChatCompletion.create(
+                    model=model_name,
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature
+                )
+                return resp
+            except Exception as e_old:
+                # If both fail, log both errors and re-raise the new-client error for clarity
+                self.logger.error(f"New OpenAI client error: {e_new}; Fallback error: {e_old}")
+                raise e_new
+
     def generate_response(self, user_message: str, model: str = 'diabetes', context: Optional[List[str]] = None, language: str = 'en') -> str:
         """Generate response using OpenAI API with enhanced language support"""
         try:
@@ -215,7 +255,7 @@ class OpenAIService:
             else:
                 # Add language-specific instructions for other languages
                 conversation_history = self._add_language_instruction(language, conversation_history, model)
-                response = self._generate_standard_response(conversation_history)
+                response = self._generate_standard_response(conversation_history, model)
             
             # Add assistant response to conversation
             self.conversation_manager.add_message(model, "assistant", response)
@@ -225,7 +265,7 @@ class OpenAIService:
         except Exception as e:
             self.logger.error(f"Error generating response: {e}")
             return self._get_fallback_response(language, model)
-    
+
     def _generate_enhanced_luganda_response(self, user_message: str, model: str, conversation_history: List[Dict]) -> str:
         """Generate enhanced Luganda response with proper medical terminology and cultural context"""
         try:
@@ -241,15 +281,19 @@ class OpenAIService:
             for message in conversation_history[-6:]:  # Keep last 6 messages for context
                 messages.append(message)
             
-            # Generate response
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                max_tokens=400,
-                temperature=0.7
-            )
+            # Use compatibility wrapper to call API
+            response = self._chat_completion(messages, model=getattr(Config, "OPENAI_MODEL", "gpt-3.5-turbo"), max_tokens=400, temperature=0.7)
             
-            raw_response = response.choices[0].message.content.strip()
+            # Extract text in a way that works for both clients
+            try:
+                raw_response = response.choices[0].message.content.strip()
+            except Exception:
+                # new-client structure: response.choices[0].message.content
+                # old-client structure: response.choices[0].message['content'] or similar - keep robust
+                try:
+                    raw_response = response.choices[0]["message"]["content"].strip()
+                except Exception:
+                    raw_response = str(response)
             
             # Post-process the response for better Luganda
             enhanced_response = self._enhance_luganda_response(raw_response, model, user_message)
@@ -259,138 +303,30 @@ class OpenAIService:
         except Exception as e:
             self.logger.error(f"Error generating Luganda response: {e}")
             return self._get_luganda_fallback(model, user_message)
-    
-    def _create_luganda_system_prompt(self, model: str) -> str:
-        """Create simple, natural Luganda system prompt"""
-        base_prompt = f"""You are a health helper who speaks Luganda naturally. Help people with {model} questions.
 
-LUGANDA SPEAKING RULES:
-- Use simple, everyday Luganda words
-- Talk like a normal Luganda speaker would talk
-- Don't use too many big words
-- Be friendly and helpful
-- Keep answers short and clear
-
-SIMPLE WORDS TO USE:
-- ssukali (sugar/diabetes)
-- musayi (blood)
-- mutwe (head) 
-- mubiri (body)
-- ddagala (medicine)
-- musawo (doctor)
-- ddwaliro (hospital)
-- mmere (food)
-- mazzi (water)
-- lubuto (pregnancy)
-- mwana (baby)
-
-HOW TO TALK:
-1. Say "Webale" or "Oli otya?"
-2. Answer the question simply
-3. Give helpful advice
-4. Say to see a doctor if serious
-5. End nicely like "Kwatira bulungi"
-
-IMPORTANT: 
-- Use normal Luganda, not fancy language
-- Give short, helpful answers
-- Don't make it complicated
-- Be like talking to a friend"""
-
-        if model == 'diabetes':
-            base_prompt += "\n\nYou help with ssukali (diabetes) problems and pregnancy health."
-        else:
-            base_prompt += "\n\nYou help with high blood pressure in pregnancy and mother health."
-            
-        return base_prompt
-    
-    def _enhance_luganda_response(self, raw_response: str, model: str, user_message: str) -> str:
-        """Keep Luganda response simple and natural"""
-        # Only replace the most obvious English words that might slip through
-        simple_replacements = {
-            'diabetes': 'ssukali',
-            'doctor': 'musawo', 
-            'hospital': 'ddwaliro',
-            'medicine': 'ddagala',
-            'pregnancy': 'lubuto',
-            'baby': 'mwana',
-            'food': 'mmere',
-            'water': 'mazzi'
-        }
-        
-        enhanced_response = raw_response
-        for english, luganda in simple_replacements.items():
-            enhanced_response = enhanced_response.replace(english, luganda)
-        
-        # Only add greeting if completely missing
-        if not any(greeting in enhanced_response.lower() for greeting in ['webale', 'oli']):
-            enhanced_response = "Webale. " + enhanced_response
-        
-        # Simple, natural closing
-        if not enhanced_response.endswith(('.', '!', '?')):
-            enhanced_response += "."
-            
-        # Don't add complicated closings - keep it simple
-        return enhanced_response
-    
-    def _get_luganda_fallback(self, model: str, user_message: str) -> str:
-        """Simple fallback responses in natural Luganda"""
-        if 'bulunji' in user_message.lower() or 'bulungi' in user_message.lower():
-            return "Webale. Ndi bulungi. Gwe oli otya? Njagala okukuyamba ku ssukali. Kiki kyoyagala okumanya?"
-        
-        if model == 'diabetes':
-            return "Nkusonyiwa. Ku ssukali, genda eri musawo amangu. Webale."
-        else:
-            return "Nkusonyiwa. Ku nsonga z'omukazi mu lubuto, genda eri musawo. Webale."
-    
-    def _generate_standard_response(self, conversation_history: List[Dict]) -> str:
+    def _generate_standard_response(self, conversation_history: List[Dict], model: str = 'diabetes') -> str:
         """Generate standard response for non-Luganda languages"""
         try:
             # Prepare messages for OpenAI
-            messages = [{"role": "system", "content": self._get_system_prompt("diabetes")}] + conversation_history
+            messages = [{"role": "system", "content": self._get_system_prompt(model)}] + conversation_history
             
-            # Generate response using OpenAI
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                max_tokens=300,
-                temperature=0.7
-            )
+            # Use compatibility wrapper
+            response = self._chat_completion(messages, model=getattr(Config, "OPENAI_MODEL", "gpt-3.5-turbo"), max_tokens=getattr(Config, "OPENAI_MAX_TOKENS", 300), temperature=getattr(Config, "OPENAI_TEMPERATURE", 0.7))
             
-            ai_response = response.choices[0].message.content.strip()
+            # Extract response content robustly
+            try:
+                ai_response = response.choices[0].message.content.strip()
+            except Exception:
+                try:
+                    ai_response = response.choices[0]["message"]["content"].strip()
+                except Exception:
+                    ai_response = str(response)
+            
             return ai_response
             
         except Exception as e:
             self.logger.error(f"Error in standard response generation: {e}")
             return "I apologize, but I'm experiencing technical difficulties. Please try again or consult with a healthcare provider."
-            
-            # Prepare messages for OpenAI
-            messages = [{"role": "system", "content": self._get_system_prompt(model)}] + conversation_history
-            
-            # Make API call
-            response = openai.ChatCompletion.create(
-                model=Config.OPENAI_MODEL,
-                messages=messages,
-                max_tokens=Config.OPENAI_MAX_TOKENS,
-                temperature=Config.OPENAI_TEMPERATURE
-            )
-            
-            ai_response = response.choices[0].message.content.strip()
-            
-            # Add AI response to conversation
-            self.conversation_manager.add_message(model, "assistant", ai_response)
-            
-            return ai_response
-            
-        except openai.error.AuthenticationError:
-            return "Error: Invalid OpenAI API key. Please check your configuration."
-        except openai.error.RateLimitError:
-            return "Error: OpenAI API rate limit exceeded. Please try again later."
-        except openai.error.APIError as e:
-            return f"Error: OpenAI API error - {str(e)}"
-        except Exception as e:
-            self.logger.error(f"OpenAI error: {str(e)}")
-            return f"Sorry, I encountered an error: {str(e)}"
     
     def _check_cross_model_query(self, user_message: str, current_model: str, language: str = 'en') -> Optional[str]:
         """Check if user is asking about the wrong topic for current model"""
