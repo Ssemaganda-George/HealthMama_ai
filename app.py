@@ -1,16 +1,36 @@
+"""
+HealthMama AI - Main Application Entry Point
+Professional Flask application for health information chatbot
+"""
 import os
 import sys
 
-# Ensure project root is on sys.path
+# Add the project root to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Create the Flask application using the factory
 from app.factory import create_app
+from config.settings import get_config
 
-app = create_app()
-# also provide WSGI-standard name
-application = app
+def main():
+    """Main application entry point"""
+    try:
+        # Create application
+        app = create_app()
+        
+        # Get configuration
+        config = get_config()
+        
+        # Run application
+        app.run(
+            host=config.HOST,
+            port=config.PORT,
+            debug=config.DEBUG
+        )
+        
+    except Exception as e:
+        print(f"Failed to start HealthMama AI: {e}")
+        sys.exit(1)
 
-if __name__ == "__main__":
-    # Local debug run
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+if __name__ == '__main__':
+    main()
