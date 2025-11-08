@@ -264,6 +264,10 @@ class OpenAIService:
             for message in conversation_history[-6:]:  # Keep last 6 messages for context
                 messages.append(message)
             
+            # DEBUG: Log the prompt and messages sent to OpenAI
+            self.logger.info(f"Luganda system prompt: {luganda_system_prompt}")
+            self.logger.info(f"Messages sent to OpenAI: {messages}")
+
             # Use compatibility wrapper to call API
             response = self._chat_completion(messages, model=getattr(Config, "OPENAI_MODEL", "gpt-3.5-turbo"), max_tokens=400, temperature=0.7)
             
@@ -271,13 +275,14 @@ class OpenAIService:
             try:
                 raw_response = response.choices[0].message.content.strip()
             except Exception:
-                # new-client structure: response.choices[0].message.content
-                # old-client structure: response.choices[0].message['content'] or similar - keep robust
                 try:
                     raw_response = response.choices[0]["message"]["content"].strip()
                 except Exception:
                     raw_response = str(response)
             
+            # DEBUG: Log the raw response from OpenAI
+            self.logger.info(f"OpenAI Luganda raw response: {raw_response}")
+
             # Post-process the response for better Luganda
             enhanced_response = self._enhance_luganda_response(raw_response, model, user_message)
             
