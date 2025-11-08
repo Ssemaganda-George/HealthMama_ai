@@ -9,7 +9,7 @@ gunicorn>=20.0
 python-dotenv>=0.20
 
 # AI/ML dependencies
-openai>=0.27.0
+openai==0.28.1
 
 # HTTP and networking
 requests>=2.28
